@@ -1,4 +1,4 @@
-# Testing Go usage as for simulation
+# Testing Go usage for simulation
 
 TODO
 
