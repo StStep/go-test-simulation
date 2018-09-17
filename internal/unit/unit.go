@@ -33,10 +33,9 @@ func (u *Unit) GetPosition() Position {
 		totalX += v.Position.X
 		totalY += v.Position.Y
 	}
-	return Position {X: totalX/len, Y: totalY/len}
+	return Position{X: totalX / len, Y: totalY / len}
 }
 
 func (u *Unit) UpdateMove(done chan bool) {
 	done <- false
 }
-

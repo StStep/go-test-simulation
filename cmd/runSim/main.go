@@ -1,9 +1,8 @@
 package main
 
-import (
-)
+import ()
 
 // our main function
 func main() {
-    print("Running simulation\r\n")
+	print("Running simulation\r\n")
 }

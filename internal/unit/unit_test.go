@@ -1,18 +1,17 @@
 package unit
 
 import (
-	"testing"
 	"github.com/stretchr/testify/assert"
+	"testing"
 )
 
 func TestNewUnit(t *testing.T) {
 	assert := assert.New(t)
 
 	tables := []struct {
-		size int
-		pos Position
+		size      int
+		pos       Position
 		expectNil bool
-
 	}{
 		{1, Position{}, false},
 		{1, Position{4, 5}, false},
