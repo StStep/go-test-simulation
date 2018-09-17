@@ -32,9 +32,31 @@ func TestNewUnit(t *testing.T) {
 }
 
 func TestGetSize(t *testing.T) {
+	assert := assert.New(t)
+
+	sizes := []int{1, 4, 8, 20, 200}
+
+	for _, v := range sizes {
+		u := NewUnit(v, Position{})
+		assert.Equal(v, u.GetSize())
+	}
 }
 
 func TestGetPosition(t *testing.T) {
+	assert := assert.New(t)
 
+	tables := []struct {
+		size int
+		pos  Position
+	}{
+		{1, Position{}},
+		{1, Position{4, 5}},
+		{10, Position{}},
+		{10, Position{-5, -4}},
+	}
+
+	for _, v := range tables {
+		u := NewUnit(v.size, v.pos)
+		assert.Equal(v.pos, u.GetPosition())
+	}
 }
-

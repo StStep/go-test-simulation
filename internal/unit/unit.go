@@ -17,8 +17,8 @@ func NewUnit(size int, pos Position) *Unit {
 		return nil
 	}
 	members := make([]Member, size)
-	for _, v := range members {
-		v.Position = pos
+	for i := 0; i < size; i++ {
+		members[i].Position = pos
 	}
 	return &Unit{members}
 }
