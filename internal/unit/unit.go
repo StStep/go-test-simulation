@@ -23,11 +23,11 @@ func NewUnit(size int, pos Position) *Unit {
 	return &Unit{members}
 }
 
-func (u *Unit) GetSize() int {
+func (u *Unit) Size() int {
 	return len(u.Members)
 }
 
-func (u *Unit) GetPosition() Position {
+func (u *Unit) Position() Position {
 	var totalX, totalY, len float64 = 0, 0, float64(len(u.Members))
 	for _, v := range u.Members {
 		totalX += v.Position.X
