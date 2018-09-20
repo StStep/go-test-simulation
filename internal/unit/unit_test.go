@@ -1,6 +1,7 @@
 package unit
 
 import (
+	"github.com/StStep/go-test-simulation/internal/vecmath"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )
@@ -10,15 +11,15 @@ func TestNewUnit(t *testing.T) {
 
 	tables := []struct {
 		size      int
-		pos       Position
+		pos       vecmath.Vector
 		expectNil bool
 	}{
-		{1, Position{}, false},
-		{1, Position{4, 5}, false},
-		{10, Position{}, false},
-		{10, Position{-5, -4}, false},
-		{0, Position{}, true},
-		{-5, Position{}, true},
+		{1, vecmath.Vector{}, false},
+		{1, vecmath.Vector{4, 5}, false},
+		{10, vecmath.Vector{}, false},
+		{10, vecmath.Vector{-5, -4}, false},
+		{0, vecmath.Vector{}, true},
+		{-5, vecmath.Vector{}, true},
 	}
 
 	for _, v := range tables {
@@ -37,7 +38,7 @@ func TestSize(t *testing.T) {
 	sizes := []int{1, 4, 8, 20, 200}
 
 	for _, v := range sizes {
-		u := NewUnit(v, Position{})
+		u := NewUnit(v, vecmath.Vector{})
 		assert.Equal(v, u.Size())
 	}
 }
@@ -47,12 +48,12 @@ func TestPosition(t *testing.T) {
 
 	tables := []struct {
 		size int
-		pos  Position
+		pos  vecmath.Vector
 	}{
-		{1, Position{}},
-		{1, Position{4, 5}},
-		{10, Position{}},
-		{10, Position{-5, -4}},
+		{1, vecmath.Vector{}},
+		{1, vecmath.Vector{4, 5}},
+		{10, vecmath.Vector{}},
+		{10, vecmath.Vector{-5, -4}},
 	}
 
 	for _, v := range tables {
