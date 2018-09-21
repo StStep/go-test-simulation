@@ -1,18 +1,14 @@
 package unit
 
-import (
-	"github.com/StStep/go-test-simulation/internal/vecmath"
-)
-
 type Member struct {
-	Position vecmath.Vector
+	Position [2]float64
 }
 
 type Unit struct {
 	Members []Member
 }
 
-func NewUnit(size int, pos vecmath.Vector) *Unit {
+func NewUnit(size int, pos [2]float64) *Unit {
 	if size <= 0 {
 		return nil
 	}
@@ -27,13 +23,13 @@ func (u *Unit) Size() int {
 	return len(u.Members)
 }
 
-func (u *Unit) Position() vecmath.Vector {
+func (u *Unit) Position() [2]float64 {
 	var totalX, totalY, len float64 = 0, 0, float64(len(u.Members))
 	for _, v := range u.Members {
-		totalX += v.Position.X
-		totalY += v.Position.Y
+		totalX += v.Position[0]
+		totalY += v.Position[1]
 	}
-	return vecmath.Vector{X: totalX / len, Y: totalY / len}
+	return [2]float64{totalX / len, totalY / len}
 }
 
 func (u *Unit) UpdateMove(done chan bool) {

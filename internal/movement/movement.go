@@ -1,19 +1,5 @@
 package movement
 
-import (
-	"github.com/StStep/go-test-simulation/internal/vecmath"
-)
-
-type Direction int
-
-const (
-	DirNone     Direction = 0
-	DirForward  Direction = 1
-	DirBackward Direction = 2
-	DirLeft     Direction = 3
-	DirRight    Direction = 4
-)
-
 type MoveDirProp struct {
 	MaxVelocity                      float64
 	Acceleration, Deceleration       float64
@@ -26,12 +12,16 @@ type MoveProp struct {
 }
 
 type Movement struct {
-	Properties   *MoveProp
-	CurVelocity  vecmath.Vector
-	CmdDirection Direction
-	CmdSpeed     float64
+	Properties   *MoveProp  // Movement properties to use with math
+	CurVelocity  [2]float64 // Represents current velocity vector
+	CmdDirection [2]float64 // Unit vector for desired movement direction
+	CmdSpeed     float64    // Scaler representing desired movement speed
 }
 
-func (l *Movement) Update(del float64) float64 {
+func (m *Movement) SetCommand(dir [2]float64, speed float64) {
+
+}
+
+func (m *Movement) Update(del float64) float64 {
 	return 0
 }
