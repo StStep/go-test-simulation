@@ -25,9 +25,23 @@
   revision = "f35b8ab0b5a2cef36673838d662e249dd9c94686"
   version = "v1.2.2"
 
+[[projects]]
+  branch = "master"
+  digest = "1:ce87c74c80aa82cbcfe4cc6b5e4de4aa756a2cee770e59b8a79848c3311c18b8"
+  name = "gonum.org/v1/gonum"
+  packages = [
+    "floats",
+    "internal/asm/f64",
+  ]
+  pruneopts = "UT"
+  revision = "20644dbe1a24b75924cac09e625a63b43203528f"
+
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  input-imports = ["github.com/stretchr/testify/assert"]
+  input-imports = [
+    "github.com/stretchr/testify/assert",
+    "gonum.org/v1/gonum/floats",
+  ]
   solver-name = "gps-cdcl"
   solver-version = 1
