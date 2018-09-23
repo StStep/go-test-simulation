@@ -25,7 +25,7 @@ func TestSetCommand(t *testing.T) {
 	}
 
 	for _, v := range tables {
-		m := NewMovement([4]float64{4, 1, 3, 2})
+		m := NewMovement([4]float64{4, 1, 3, 2}, [4]float64{}, [4]float64{}, [4]float64{}, [4]float64{}, 0, 0)
 		m.SetCommand(v.dir, v.cmdSpeed)
 		assert.Equal(v.expDir, m.CmdDirection)
 		assert.Equal(v.expSpeed, m.CmdSpeed)

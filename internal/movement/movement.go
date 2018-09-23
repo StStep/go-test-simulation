@@ -24,12 +24,14 @@ type Movement struct {
 }
 
 // Forward Backward, Right, Left
-func NewMovement(maxVel [4]float64) *Movement {
+func NewMovement(maxVel [4]float64, accel [4]float64, decel [4]float64, enRate [4]float64, enBase [4]float64, turnRate float64, turnBase float64) *Movement {
 	m := MoveProp{
-		Forward:  MoveDirProp{MaxVelocity: maxVel[0]},
-		Backward: MoveDirProp{MaxVelocity: maxVel[1]},
-		Right:    MoveDirProp{MaxVelocity: maxVel[2]},
-		Left:     MoveDirProp{MaxVelocity: maxVel[3]},
+		Forward:        MoveDirProp{MaxVelocity: maxVel[0], Acceleration: accel[0], Deceleration: decel[0], EnergyUsageRate: enRate[0], BaseEnergyUsage: enBase[0]},
+		Backward:       MoveDirProp{MaxVelocity: maxVel[1], Acceleration: accel[1], Deceleration: decel[1], EnergyUsageRate: enRate[1], BaseEnergyUsage: enBase[1]},
+		Right:          MoveDirProp{MaxVelocity: maxVel[2], Acceleration: accel[2], Deceleration: decel[2], EnergyUsageRate: enRate[2], BaseEnergyUsage: enBase[2]},
+		Left:           MoveDirProp{MaxVelocity: maxVel[3], Acceleration: accel[3], Deceleration: decel[3], EnergyUsageRate: enRate[3], BaseEnergyUsage: enBase[3]},
+		TurnRadiusRate: turnRate,
+		BaseTurnRadius: turnBase,
 	}
 	return &Movement{Properties: &m}
 }
