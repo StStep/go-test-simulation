@@ -16,6 +16,15 @@ type MoveProp struct {
 	TurnRadiusRate, BaseTurnRadius float64
 }
 
+func (m *MoveProp) TurnRateAt(speed float64) float64 {
+	ret := m.BaseTurnRadius + m.TurnRadiusRate*speed
+	if ret < 0 {
+		return 0
+	} else {
+		return ret
+	}
+}
+
 type Movement struct {
 	Properties   *MoveProp  // Movement properties to use with math
 	CurVelocity  [2]float64 // Represents current velocity vector
@@ -36,18 +45,9 @@ func NewMovement(maxVel [4]float64, accel [4]float64, decel [4]float64, enRate [
 	return &Movement{Properties: &m}
 }
 
-func (m *Movement) TurnRateAt(speed float64) float64 {
-	ret := m.Properties.BaseTurnRadius + m.Properties.TurnRadiusRate*speed
-	if ret < 0 {
-		return 0
-	} else {
-		return ret
-	}
-}
-
 // Turn rate used for setting arc for current direction
 func (m *Movement) TurnRate() float64 {
-	return m.TurnRateAt(fl.Norm(m.CurVelocity[:], 1))
+	return m.Properties.TurnRateAt(fl.Norm(m.CurVelocity[:], 1))
 }
 
 // dir[1] > 0 ? Front : Back; dir[0] > 0 ? Right : Left
