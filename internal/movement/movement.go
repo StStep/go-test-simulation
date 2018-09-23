@@ -24,7 +24,7 @@ type Movement struct {
 }
 
 // Forward Backward, Right, Left
-func NewMovement(maxVel [4]float64, accel [4]float64, decel [4]float64, enRate [4]float64, enBase [4]float64, turnRate float64, turnBase float64) *Movement {
+func NewMovement(maxVel [4]float64, accel [4]float64, decel [4]float64, enRate [4]float64, enBase [4]float64, turnBase float64, turnRate float64) *Movement {
 	m := MoveProp{
 		Forward:        MoveDirProp{MaxVelocity: maxVel[0], Acceleration: accel[0], Deceleration: decel[0], EnergyUsageRate: enRate[0], BaseEnergyUsage: enBase[0]},
 		Backward:       MoveDirProp{MaxVelocity: maxVel[1], Acceleration: accel[1], Deceleration: decel[1], EnergyUsageRate: enRate[1], BaseEnergyUsage: enBase[1]},
@@ -34,6 +34,20 @@ func NewMovement(maxVel [4]float64, accel [4]float64, decel [4]float64, enRate [
 		BaseTurnRadius: turnBase,
 	}
 	return &Movement{Properties: &m}
+}
+
+func (m *Movement) TurnRateAt(speed float64) float64 {
+	ret := m.Properties.BaseTurnRadius + m.Properties.TurnRadiusRate*speed
+	if ret < 0 {
+		return 0
+	} else {
+		return ret
+	}
+}
+
+// Turn rate used for setting arc for current direction
+func (m *Movement) TurnRate() float64 {
+	return m.TurnRateAt(fl.Norm(m.CurVelocity[:], 1))
 }
 
 // dir[1] > 0 ? Front : Back; dir[0] > 0 ? Right : Left

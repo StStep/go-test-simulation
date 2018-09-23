@@ -31,3 +31,28 @@ func TestSetCommand(t *testing.T) {
 		assert.Equal(v.expSpeed, m.CmdSpeed)
 	}
 }
+
+func TestTurnRate(t *testing.T) {
+	assert := assert.New(t)
+
+	tables := []struct {
+		baseRadius    float64
+		rate          float64
+		speed         float64
+		expTurnRadius float64
+	}{
+		{3, 0.5, 2, 4},  // Normal
+		{3, -0.5, 2, 2}, // Negative
+		{3, -1, 3, 0},   // Exact 0
+		{3, -1, 10, 0},  // Beyond 0
+		{0, 1, 0, 0},    // 0 Base and No Vel
+		{0, 1, 2, 2},    // 0 Base and Vel
+	}
+
+	for _, v := range tables {
+		m := NewMovement([4]float64{}, [4]float64{}, [4]float64{}, [4]float64{}, [4]float64{}, v.baseRadius, v.rate)
+		m.CurVelocity = [2]float64{0, v.speed}
+		assert.Equal(v.expTurnRadius, m.TurnRateAt(v.speed))
+		assert.Equal(v.expTurnRadius, m.TurnRate())
+	}
+}
