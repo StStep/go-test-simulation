@@ -14,14 +14,18 @@ func TestSetCommand(t *testing.T) {
 		expDir   [2]float64
 		expSpeed float64
 	}{
-		{[2]float64{0, 1}, 4, [2]float64{0, 1}, 4},
-		{[2]float64{1, 0}, 4, [2]float64{1, 0}, 3},
-		{[2]float64{0, 2}, 8, [2]float64{0, 1}, 4},
-		{[2]float64{2, 0}, 8, [2]float64{1, 0}, 3},
-		{[2]float64{-1, 0}, 4, [2]float64{-1, 0}, 2},
-		{[2]float64{0, -1}, 4, [2]float64{0, -1}, 1},
-		{[2]float64{.5, .5}, 4, [2]float64{.5, .5}, 3.5},
-		{[2]float64{-.5, -.5}, 4, [2]float64{-.5, -.5}, 1.5},
+		{[2]float64{0, 1}, 4, [2]float64{0, 1}, 4},           // Forward Equal
+		{[2]float64{1, 0}, 4, [2]float64{1, 0}, 3},           // Right Saturate Vel
+		{[2]float64{0, 2}, 8, [2]float64{0, 1}, 4},           // Forward Saturate Dir and Vel
+		{[2]float64{2, 0}, 8, [2]float64{1, 0}, 3},           // Right Saturate Dir and Vel
+		{[2]float64{-1, 0}, 4, [2]float64{-1, 0}, 2},         // Left Saturate Vel
+		{[2]float64{0, -1}, 4, [2]float64{0, -1}, 1},         // Backwards Saturate Vel
+		{[2]float64{.5, .5}, 4, [2]float64{.5, .5}, 3.5},     // Forward-Right Saturate Vel
+		{[2]float64{-.5, -.5}, 4, [2]float64{-.5, -.5}, 1.5}, // Back-Left Saturate Vel
+		{[2]float64{0, 0.5}, 2, [2]float64{0, 1}, 2},         // Forward Less Dir and Ve
+		{[2]float64{1, 0}, 1, [2]float64{1, 0}, 1},           // Right Less Vel
+		{[2]float64{-1, 0}, 1, [2]float64{-1, 0}, 1},         // Left Less Vel
+		{[2]float64{0, -1}, 0.5, [2]float64{0, -1}, 0.5},     // Backwards Less Vel
 	}
 
 	for _, v := range tables {
