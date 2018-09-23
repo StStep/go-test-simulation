@@ -17,3 +17,5 @@ run:
 	./$(BINARY)
 deps:
 	dep ensure
+doc:
+	godoc $(PACKAGE)
