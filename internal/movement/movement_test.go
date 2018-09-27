@@ -28,12 +28,12 @@ func TestSetCommand(t *testing.T) {
 		{[2]float64{0, -1}, 0.5, [2]float64{0, -1}, 0.5},          // Backwards Less Vel
 	}
 
-	for _, v := range tables {
+	for i, v := range tables {
 		m := NewMovement([4]float64{4, 1, 3, 2}, [4]float64{}, [4]float64{}, [4]float64{}, [4]float64{}, 0, 0)
 		m.SetCommand(v.dir, v.cmdSpeed)
 		dir, speed := m.Command()
-		assert.InDeltaSlice(v.expDir[:], dir[:], 0.01)
-		assert.InDelta(v.expSpeed, speed, 0.01)
+		assert.InDeltaSlicef(v.expDir[:], dir[:], 0.01, "Test %v", i)
+		assert.InDeltaf(v.expSpeed, speed, 0.01, "Test %v", i)
 	}
 }
 
@@ -54,11 +54,11 @@ func TestTurnRate(t *testing.T) {
 		{0, 1, 2, 2},    // 0 Base and Vel
 	}
 
-	for _, v := range tables {
+	for i, v := range tables {
 		m := NewMovement([4]float64{}, [4]float64{}, [4]float64{}, [4]float64{}, [4]float64{}, v.baseRadius, v.rate)
 		m.curVelocity = [2]float64{0, v.speed}
-		assert.Equal(v.expTurnRadius, m.Prop.TurnRateAt(v.speed))
-		assert.Equal(v.expTurnRadius, m.TurnRate())
+		assert.InDeltaf(v.expTurnRadius, m.Prop.TurnRateAt(v.speed), 0.01, "Test %v", i)
+		assert.InDeltaf(v.expTurnRadius, m.TurnRate(), 0.01, "Test %v", i)
 	}
 }
 
@@ -72,15 +72,15 @@ func TestUpdate(t *testing.T) {
 		upCount  int
 		expVel   [2]float64
 	}{
-		{[2]float64{0, 1}, 4, 0.01, 10, [2]float64{0, 0.4}}, // Forward, don't max
-		{[2]float64{0, 1}, 4, 0.1, 1, [2]float64{0, 0.4}},   // Forward, don't max, combine into 1 update
+		{[2]float64{0, 1}, 4, 0.01, 10, [2]float64{0, 0.1}}, // Forward, don't max
+		{[2]float64{0, 1}, 4, 0.1, 1, [2]float64{0, 0.1}},   // Forward, don't max, combine into 1 update
 		{[2]float64{0, 1}, 4, 0.1, 40, [2]float64{0, 4}},    // Forward, time to max speed
 		{[2]float64{0, 1}, 4, 0.2, 40, [2]float64{0, 4}},    // Forward, time beyond max
 		{[2]float64{0, 1}, 2, 0.1, 20, [2]float64{0, 2}},    // Forward half speed, time to max speed
 		{[2]float64{0, 1}, 2, 0.2, 20, [2]float64{0, 2}},    // Forward half speed, time beyond max
 	}
 
-	for _, v := range tables {
+	for i, v := range tables {
 		m := NewMovement([4]float64{4, 1, 3, 2}, [4]float64{4 / 4, 1 / 4, 3 / 4, 2 / 4}, [4]float64{4 / 8, 1 / 8, 3 / 8, 2 / 8}, [4]float64{}, [4]float64{}, 0, 0)
 		m.SetCommand(v.dir, v.cmdSpeed)
 
@@ -88,6 +88,6 @@ func TestUpdate(t *testing.T) {
 			m.Update(v.del)
 		}
 
-		assert.Equal(v.expVel, m.curVelocity)
+		assert.InDeltaSlicef(v.expVel[:], m.curVelocity[:], 0.01, "Test %v", i)
 	}
 }

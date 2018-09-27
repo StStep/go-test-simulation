@@ -78,5 +78,66 @@ func (m *Movement) SetCommand(dir [2]float64, speed float64) {
 }
 
 func (m *Movement) Update(del float64) float64 {
+	var diff [2]float64
+	fl.SubTo(diff[:], m.curVelocity[:], m.cmdVelocity[:])
+
+	// Check horizantal velocity, use right if positive
+	hind := 3
+	if m.curVelocity[0] > 0 {
+		hind = 2
+	} else if m.curVelocity[0] < 0 {
+		hind = 3
+	} else if m.cmdVelocity[0] > 0 {
+		hind = 2
+	} else {
+		hind = 3
+	}
+
+	hdiff := diff[0]
+	if hdiff > 0 {
+		hdiff -= m.Prop.Deceleration[hind] * del
+		if hdiff < 0 {
+			hdiff = 0
+		}
+	} else if hdiff < 0 {
+		hdiff += m.Prop.Acceleration[hind] * del
+		if hdiff > 0 {
+			hdiff = 0
+		}
+	} else {
+		hdiff = 0
+	}
+
+	// Check vertival velocity, use forward if positive
+	vind := 1
+	if m.curVelocity[1] > 0 {
+		vind = 0
+	} else if m.curVelocity[1] < 0 {
+		vind = 1
+	} else if m.cmdVelocity[1] > 0 {
+		vind = 0
+	} else {
+		vind = 1
+	}
+
+	vdiff := diff[1]
+	if vdiff > 0 {
+		vdiff -= m.Prop.Deceleration[vind] * del
+		if vdiff < 0 {
+			vdiff = 0
+		}
+	} else if vdiff < 0 {
+		vdiff += m.Prop.Acceleration[vind] * del
+		if vdiff > 0 {
+			vdiff = 0
+		}
+	} else {
+		vdiff = 0
+	}
+
+	// Update vel
+	fl.AddTo(m.curVelocity[:], []float64{hdiff, vdiff}, m.cmdVelocity[:])
+
+	// TODO figure out return
 	return 0
 }
