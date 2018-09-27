@@ -14,25 +14,26 @@ func TestSetCommand(t *testing.T) {
 		expDir   [2]float64
 		expSpeed float64
 	}{
-		{[2]float64{0, 1}, 4, [2]float64{0, 1}, 4},           // Forward Equal
-		{[2]float64{1, 0}, 4, [2]float64{1, 0}, 3},           // Right Saturate Vel
-		{[2]float64{0, 2}, 8, [2]float64{0, 1}, 4},           // Forward Saturate Dir and Vel
-		{[2]float64{2, 0}, 8, [2]float64{1, 0}, 3},           // Right Saturate Dir and Vel
-		{[2]float64{-1, 0}, 4, [2]float64{-1, 0}, 2},         // Left Saturate Vel
-		{[2]float64{0, -1}, 4, [2]float64{0, -1}, 1},         // Backwards Saturate Vel
-		{[2]float64{.5, .5}, 4, [2]float64{.5, .5}, 3.5},     // Forward-Right Saturate Vel
-		{[2]float64{-.5, -.5}, 4, [2]float64{-.5, -.5}, 1.5}, // Back-Left Saturate Vel
-		{[2]float64{0, 0.5}, 2, [2]float64{0, 1}, 2},         // Forward Less Dir and Ve
-		{[2]float64{1, 0}, 1, [2]float64{1, 0}, 1},           // Right Less Vel
-		{[2]float64{-1, 0}, 1, [2]float64{-1, 0}, 1},         // Left Less Vel
-		{[2]float64{0, -1}, 0.5, [2]float64{0, -1}, 0.5},     // Backwards Less Vel
+		{[2]float64{0, 1}, 4, [2]float64{0, 1}, 4},                // Forward Equal
+		{[2]float64{1, 0}, 4, [2]float64{1, 0}, 3},                // Right Saturate Vel
+		{[2]float64{0, 2}, 8, [2]float64{0, 1}, 4},                // Forward Saturate Dir and Vel
+		{[2]float64{2, 0}, 8, [2]float64{1, 0}, 3},                // Right Saturate Dir and Vel
+		{[2]float64{-1, 0}, 4, [2]float64{-1, 0}, 2},              // Left Saturate Vel
+		{[2]float64{0, -1}, 4, [2]float64{0, -1}, 1},              // Backwards Saturate Vel
+		{[2]float64{1, 1}, 4, [2]float64{.707, .707}, 3.54},       // Forward-Right Saturate Vel
+		{[2]float64{-.5, -.5}, 4, [2]float64{-.707, -.707}, 1.58}, // Back-Left Saturate Vel
+		{[2]float64{0, 0.5}, 2, [2]float64{0, 1}, 2},              // Forward Less Dir and Ve
+		{[2]float64{1, 0}, 1, [2]float64{1, 0}, 1},                // Right Less Vel
+		{[2]float64{-1, 0}, 1, [2]float64{-1, 0}, 1},              // Left Less Vel
+		{[2]float64{0, -1}, 0.5, [2]float64{0, -1}, 0.5},          // Backwards Less Vel
 	}
 
 	for _, v := range tables {
 		m := NewMovement([4]float64{4, 1, 3, 2}, [4]float64{}, [4]float64{}, [4]float64{}, [4]float64{}, 0, 0)
 		m.SetCommand(v.dir, v.cmdSpeed)
-		assert.Equal(v.expDir, m.CmdDirection)
-		assert.Equal(v.expSpeed, m.CmdSpeed)
+		dir, speed := m.Command()
+		assert.InDeltaSlice(v.expDir[:], dir[:], 0.01)
+		assert.InDelta(v.expSpeed, speed, 0.01)
 	}
 }
 
@@ -55,7 +56,7 @@ func TestTurnRate(t *testing.T) {
 
 	for _, v := range tables {
 		m := NewMovement([4]float64{}, [4]float64{}, [4]float64{}, [4]float64{}, [4]float64{}, v.baseRadius, v.rate)
-		m.CurVelocity = [2]float64{0, v.speed}
+		m.curVelocity = [2]float64{0, v.speed}
 		assert.Equal(v.expTurnRadius, m.Properties.TurnRateAt(v.speed))
 		assert.Equal(v.expTurnRadius, m.TurnRate())
 	}
@@ -87,6 +88,6 @@ func TestUpdate(t *testing.T) {
 			m.Update(v.del)
 		}
 
-		assert.Equal(v.expVel, m.CurVelocity)
+		assert.Equal(v.expVel, m.curVelocity)
 	}
 }

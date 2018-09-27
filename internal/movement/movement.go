@@ -2,7 +2,6 @@ package movement
 
 import (
 	fl "gonum.org/v1/gonum/floats"
-	"math"
 )
 
 type MoveDirProp struct {
@@ -26,10 +25,9 @@ func (m *MoveProp) TurnRateAt(speed float64) float64 {
 }
 
 type Movement struct {
-	Properties   *MoveProp  // Movement properties to use with math
-	CurVelocity  [2]float64 // Represents current velocity vector
-	CmdDirection [2]float64 // Unit vector for desired movement direction
-	CmdSpeed     float64    // Scaler representing desired movement speed
+	Properties  *MoveProp  // Movement properties to use with math
+	curVelocity [2]float64 // Represents current velocity vector
+	cmdVelocity [2]float64 // Represents commanded velocity vector
 }
 
 // Forward Backward, Right, Left
@@ -47,33 +45,47 @@ func NewMovement(maxVel [4]float64, accel [4]float64, decel [4]float64, enRate [
 
 // Turn rate used for setting arc for current direction
 func (m *Movement) TurnRate() float64 {
-	return m.Properties.TurnRateAt(fl.Norm(m.CurVelocity[:], 1))
+	return m.Properties.TurnRateAt(fl.Norm(m.curVelocity[:], 2))
+}
+
+func (m *Movement) Command() ([2]float64, float64) {
+	t := m.cmdVelocity[:]
+	speed := fl.Norm(t, 2)
+	fl.Scale(1/speed, t)
+
+	return [2]float64{t[0], t[1]}, speed
 }
 
 // dir[1] > 0 ? Front : Back; dir[0] > 0 ? Right : Left
 func (m *Movement) SetCommand(dir [2]float64, speed float64) {
 	// Set to unit vector if not already
-	fl.Scale(1/fl.Norm(dir[:], 1), dir[:])
-	copy(m.CmdDirection[:], dir[:])
+	fl.Scale(1/fl.Norm(dir[:], 2), dir[:])
 
-	// Check horizantal velocity
-	hsp := 0.0
-	if m.CmdDirection[0] > 0 {
-		hsp = math.Min(speed, m.Properties.Right.MaxVelocity) * m.CmdDirection[0]
+	// Check max horizantal velocity
+	hsp := dir[0]
+	if hsp > 0 {
+		hsp *= m.Properties.Right.MaxVelocity
 	} else {
-		hsp = math.Min(speed, m.Properties.Left.MaxVelocity) * m.CmdDirection[0] * -1
+		hsp *= m.Properties.Left.MaxVelocity
 	}
 
-	// Check vertical max velocity
-	vsp := 0.0
-	if m.CmdDirection[1] > 0 {
-		vsp = math.Min(speed, m.Properties.Forward.MaxVelocity) * m.CmdDirection[1]
+	// Check max vertical max velocity
+	vsp := dir[1]
+	if vsp > 0 {
+		vsp *= m.Properties.Forward.MaxVelocity
 	} else {
-		vsp = math.Min(speed, m.Properties.Backward.MaxVelocity) * m.CmdDirection[1] * -1
+		vsp *= m.Properties.Backward.MaxVelocity
 	}
 
-	// Combine
-	m.CmdSpeed = vsp + hsp
+	// Cap based on calc max
+	adjSpeed := speed
+	if mx := fl.Norm([]float64{hsp, vsp}, 2); adjSpeed > mx {
+		adjSpeed = mx
+	}
+
+	// Set vel to dir scaled by speed
+	copy(m.cmdVelocity[:], dir[:])
+	fl.Scale(adjSpeed, m.cmdVelocity[:])
 }
 
 func (m *Movement) Update(del float64) float64 {
