@@ -57,7 +57,7 @@ func TestTurnRate(t *testing.T) {
 	for _, v := range tables {
 		m := NewMovement([4]float64{}, [4]float64{}, [4]float64{}, [4]float64{}, [4]float64{}, v.baseRadius, v.rate)
 		m.curVelocity = [2]float64{0, v.speed}
-		assert.Equal(v.expTurnRadius, m.Properties.TurnRateAt(v.speed))
+		assert.Equal(v.expTurnRadius, m.Prop.TurnRateAt(v.speed))
 		assert.Equal(v.expTurnRadius, m.TurnRate())
 	}
 }

@@ -4,15 +4,11 @@ import (
 	fl "gonum.org/v1/gonum/floats"
 )
 
-type MoveDirProp struct {
-	MaxVelocity                      float64
-	Acceleration, Deceleration       float64
-	EnergyUsageRate, BaseEnergyUsage float64
-}
-
 type MoveProp struct {
-	Forward, Backward, Right, Left MoveDirProp
-	TurnRadiusRate, BaseTurnRadius float64
+	MaxVelocity                      [4]float64
+	Acceleration, Deceleration       [4]float64
+	EnergyUsageRate, BaseEnergyUsage [4]float64
+	TurnRadiusRate, BaseTurnRadius   float64
 }
 
 func (m *MoveProp) TurnRateAt(speed float64) float64 {
@@ -25,27 +21,20 @@ func (m *MoveProp) TurnRateAt(speed float64) float64 {
 }
 
 type Movement struct {
-	Properties  *MoveProp  // Movement properties to use with math
+	Prop        *MoveProp  // Movement properties to use with math
 	curVelocity [2]float64 // Represents current velocity vector
 	cmdVelocity [2]float64 // Represents commanded velocity vector
 }
 
-// Forward Backward, Right, Left
+// Forward, Backward, Right, Left
 func NewMovement(maxVel [4]float64, accel [4]float64, decel [4]float64, enRate [4]float64, enBase [4]float64, turnBase float64, turnRate float64) *Movement {
-	m := MoveProp{
-		Forward:        MoveDirProp{MaxVelocity: maxVel[0], Acceleration: accel[0], Deceleration: decel[0], EnergyUsageRate: enRate[0], BaseEnergyUsage: enBase[0]},
-		Backward:       MoveDirProp{MaxVelocity: maxVel[1], Acceleration: accel[1], Deceleration: decel[1], EnergyUsageRate: enRate[1], BaseEnergyUsage: enBase[1]},
-		Right:          MoveDirProp{MaxVelocity: maxVel[2], Acceleration: accel[2], Deceleration: decel[2], EnergyUsageRate: enRate[2], BaseEnergyUsage: enBase[2]},
-		Left:           MoveDirProp{MaxVelocity: maxVel[3], Acceleration: accel[3], Deceleration: decel[3], EnergyUsageRate: enRate[3], BaseEnergyUsage: enBase[3]},
-		TurnRadiusRate: turnRate,
-		BaseTurnRadius: turnBase,
-	}
-	return &Movement{Properties: &m}
+	m := MoveProp{maxVel, accel, decel, enRate, enBase, turnRate, turnBase}
+	return &Movement{Prop: &m}
 }
 
 // Turn rate used for setting arc for current direction
 func (m *Movement) TurnRate() float64 {
-	return m.Properties.TurnRateAt(fl.Norm(m.curVelocity[:], 2))
+	return m.Prop.TurnRateAt(fl.Norm(m.curVelocity[:], 2))
 }
 
 func (m *Movement) Command() ([2]float64, float64) {
@@ -64,17 +53,17 @@ func (m *Movement) SetCommand(dir [2]float64, speed float64) {
 	// Check max horizantal velocity
 	hsp := dir[0]
 	if hsp > 0 {
-		hsp *= m.Properties.Right.MaxVelocity
+		hsp *= m.Prop.MaxVelocity[2]
 	} else {
-		hsp *= m.Properties.Left.MaxVelocity
+		hsp *= m.Prop.MaxVelocity[3]
 	}
 
 	// Check max vertical max velocity
 	vsp := dir[1]
 	if vsp > 0 {
-		vsp *= m.Properties.Forward.MaxVelocity
+		vsp *= m.Prop.MaxVelocity[0]
 	} else {
-		vsp *= m.Properties.Backward.MaxVelocity
+		vsp *= m.Prop.MaxVelocity[1]
 	}
 
 	// Cap based on calc max
