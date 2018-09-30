@@ -59,12 +59,43 @@ func TestUpdateEntity(t *testing.T) {
 			vel := s.velocity[v.id]
 			assert.InDeltaSlicef(vel[:], v.vel[:], 0.01, "Test %v", i)
 		} else {
-			assert.False(s.UpdateEntity(v.id, v.vel), "Test %v", i)
+			assert.Falsef(s.UpdateEntity(v.id, v.vel), "Test %v", i)
 		}
 
 		for k := 0; k < v.count; k++ {
 			s.UnregisterEntity(k + 1)
 		}
 		assert.Equal(0, s.EntityCount(), "Test %v", i)
+	}
+}
+
+func TestCollisions(t *testing.T) {
+	assert := assert.New(t)
+
+	tables := []struct {
+		poss    [][2]float64
+		radii   []float64
+		expColl [][2]int
+	}{
+		{[][2]float64{[2]float64{0, 0}, [2]float64{2, 0}}, []float64{1, 1.5},
+			[][2]int{[2]int{1, 2}}}, // Simple Collision
+		{[][2]float64{[2]float64{0, 0}, [2]float64{2, 0}, [2]float64{0, 1}}, []float64{1, 1.5, 2},
+			[][2]int{[2]int{1, 2}, [2]int{1, 3}, [2]int{2, 3}}}, // Double Collision
+		{[][2]float64{[2]float64{0, 0}, [2]float64{2, 0}}, []float64{1, 0.5}, [][2]int{}}, // No Collision
+	}
+
+	for i, v := range tables {
+		s := NewSpace()
+
+		for k := 0; k < len(v.poss); k++ {
+			s.RegisterEntity(v.poss[k], v.radii[k])
+		}
+		coll := s.Collisions()
+
+		assert.Equalf(len(v.expColl), len(coll), "Test %v", i)
+		for k := 0; k < len(v.expColl); k++ {
+			assert.Equalf(v.expColl[k][0], coll[k][0], "Test %v", i)
+			assert.Equalf(v.expColl[k][1], coll[k][1], "Test %v", i)
+		}
 	}
 }
