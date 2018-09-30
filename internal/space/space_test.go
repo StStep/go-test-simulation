@@ -24,11 +24,13 @@ func TestRegisteration(t *testing.T) {
 		for k := 0; k < v.count; k++ {
 			assert.Equalf(k+1, s.RegisterEntity(v.pos, v.radius), "Test %v", i)
 			assert.Truef(s.UpdateEntity(k+1, v.vel), "Test %v", i)
+			assert.Truef(s.Contains(k+1), "Test %v", i)
 		}
 		assert.Equalf(v.expCount, s.EntityCount(), "Test %v", i)
 
 		for k := 0; k < v.count; k++ {
 			s.UnregisterEntity(k + 1)
+			assert.Falsef(s.Contains(k+1), "Test %v", i)
 		}
 		assert.Equalf(0, s.EntityCount(), "Test %v", i)
 	}
