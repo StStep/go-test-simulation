@@ -65,7 +65,33 @@ func TestUpdateEntity(t *testing.T) {
 		for k := 0; k < v.count; k++ {
 			s.UnregisterEntity(k + 1)
 		}
-		assert.Equal(0, s.EntityCount(), "Test %v", i)
+		assert.Equalf(0, s.EntityCount(), "Test %v", i)
+	}
+}
+
+func TestStep(t *testing.T) {
+	assert := assert.New(t)
+
+	tables := []struct {
+		startPos [2]float64
+		vel      [2]float64
+		stepSize float64
+		steps    int
+		expPos   [2]float64
+	}{
+		{[2]float64{0, 0}, [2]float64{10, 0}, 0.01, 100, [2]float64{10, 0}}, // Forward 10
+	}
+
+	for i, v := range tables {
+		s := NewSpace()
+		s.RegisterEntity(v.startPos, 0)
+		s.UpdateEntity(1, v.vel)
+
+		for k := 0; k < v.steps; k++ {
+			s.Step(v.stepSize)
+		}
+		pos := s.positions[1]
+		assert.InDeltaSlicef(v.expPos[:], pos[:], 0.01, "Test %v: Exp %v Pos %v", i, v.expPos, pos)
 	}
 }
 
