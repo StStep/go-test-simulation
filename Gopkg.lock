@@ -10,6 +10,22 @@
   version = "v1.1.1"
 
 [[projects]]
+  digest = "1:31a18dae27a29aa074515e43a443abfd2ba6deb6d69309d8d7ce789c45f34659"
+  name = "github.com/go-logfmt/logfmt"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "390ab7935ee28ec6b286364bba9b4dd6410cb3d5"
+  version = "v0.3.0"
+
+[[projects]]
+  branch = "master"
+  digest = "1:a64e323dc06b73892e5bb5d040ced475c4645d456038333883f58934abbf6f72"
+  name = "github.com/kr/logfmt"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "b84e30acd515aadc4b783ad4ff83aff3299bdfe0"
+
+[[projects]]
   digest = "1:0028cb19b2e4c3112225cd871870f2d9cf49b9b4276531f03438a88e94be86fe"
   name = "github.com/pmezard/go-difflib"
   packages = ["difflib"]
@@ -40,6 +56,7 @@
   analyzer-name = "dep"
   analyzer-version = 1
   input-imports = [
+    "github.com/go-logfmt/logfmt",
     "github.com/stretchr/testify/assert",
     "gonum.org/v1/gonum/floats",
   ]

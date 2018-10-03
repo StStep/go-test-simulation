@@ -4,7 +4,10 @@ package space
 // Note: Leaves control of velocity in hands of updater, only provides collision information, doesn't enforce it
 
 import (
+	"fmt"
+	"github.com/go-logfmt/logfmt"
 	fl "gonum.org/v1/gonum/floats"
+	"io"
 )
 
 type Space struct {
@@ -15,6 +18,7 @@ type Space struct {
 	lastId    int
 	cvalid    bool
 	ccolls    [][2]int
+	loge      *logfmt.Encoder
 }
 
 func NewSpace() *Space {
@@ -25,8 +29,13 @@ func NewSpace() *Space {
 	s.ids = make([]int, 0)
 	s.cvalid = false
 	s.ccolls = make([][2]int, 0)
+	s.loge = nil
 
 	return &s
+}
+
+func (s *Space) SetLogOutput(out io.Writer) {
+	s.loge = logfmt.NewEncoder(out)
 }
 
 func (s *Space) EntityCount() int {
@@ -83,6 +92,11 @@ func (s *Space) UnregisterEntity(id int) {
 
 func (s *Space) Step(del float64) {
 
+	if s.loge != nil {
+		s.loge.EncodeKeyval("tag", "step")
+		s.loge.EndRecord()
+	}
+
 	// Calc for each
 	for _, v := range s.ids {
 		pos := s.positions[v]
@@ -93,6 +107,14 @@ func (s *Space) Step(del float64) {
 		var res [2]float64
 		copy(res[:], pos[:])
 		s.positions[v] = res
+
+		if s.loge != nil {
+			s.loge.EncodeKeyval("tag", "update")
+			s.loge.EncodeKeyval("id", v)
+			s.loge.EncodeKeyval("pos", fmt.Sprintf("%v,%v", s.positions[v][0], s.positions[v][1]))
+			s.loge.EncodeKeyval("vel", fmt.Sprintf("%v,%v", s.velocity[v][0], s.velocity[v][1]))
+			s.loge.EndRecord()
+		}
 	}
 
 	// Invaidate and empty
