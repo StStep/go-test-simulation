@@ -62,6 +62,14 @@ func (s *Space) RegisterEntity(pos [2]float64, radius float64) int {
 	s.radii[s.lastId] = radius
 	s.velocity[s.lastId] = [2]float64{}
 	s.ids = append(s.ids, s.lastId)
+	if s.loge != nil {
+		s.loge.EncodeKeyval("tag", "add")
+		s.loge.EncodeKeyval("id", s.lastId)
+		s.loge.EncodeKeyval("shape", "circle")
+		s.loge.EncodeKeyval("pos", fmt.Sprintf("%v,%v", pos[0], pos[1]))
+		s.loge.EncodeKeyval("radius", radius)
+		s.loge.EndRecord()
+	}
 	return s.lastId
 }
 
