@@ -34,7 +34,31 @@ func TestNewFormation(t *testing.T) {
 }
 
 func TestGiveTakeSlot(t *testing.T) {
-	// TODO
+	assert := assert.New(t)
+
+	tables := []struct {
+		style       string
+		width       int
+		fileSpacing float64
+		rankSpacing float64
+		size        int
+		notEmpty    []int
+		give        int
+		take        int
+		expFound    bool
+	}{
+		{"", 5, .25, .25, 20, []int{0, 1, 2, 3}, 1, 1, true},  // Start full, give then take
+		{"", 5, .25, .25, 20, []int{0, 1, 2, 3}, 1, 3, false}, // Start full, give then take
+	}
+
+	for i, v := range tables {
+		f := NewFormation(v.style, v.width, v.fileSpacing, v.rankSpacing, v.size)
+		for _, closedSlot := range v.notEmpty {
+			assert.Truef(f.TakeSlot(closedSlot), "Test %v", i)
+		}
+		f.GiveSlot(v.give)
+		assert.Equalf(v.expFound, f.TakeSlot(v.take), "Test %v", i)
+	}
 }
 
 func TestTakeClosestOpenSlot(t *testing.T) {
