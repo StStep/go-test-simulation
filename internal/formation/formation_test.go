@@ -27,8 +27,10 @@ func TestNewFormation(t *testing.T) {
 		assert.Equal(v.expCapSlot, f.capSlot, "Test %v", i)
 		assert.Equal("Captain", f.tags[f.capSlot], "Test %v", i)
 		for k := 0; k < f.size; k++ {
-			assert.InDeltaf(v.firstOffset[0]+float64(k%v.width)*v.fileSpacing, f.slots[k][0], 0.01, "Test %v, 0 Loop %v", i, k)
-			assert.InDeltaf(v.firstOffset[1]-float64(k/v.width)*v.rankSpacing, f.slots[k][1], 0.01, "Test %v, 1 Loop %v", i, k)
+			x := v.firstOffset[0] + float64(k%v.width)*v.fileSpacing
+			y := v.firstOffset[1] - float64(k/v.width)*v.rankSpacing
+			assert.InDeltaf(x, f.Offset(k)[0], 0.01, "Test %v, 0 Loop %v", i, k)
+			assert.InDeltaf(y, f.Offset(k)[1], 0.01, "Test %v, 0 Loop %v", i, k)
 		}
 	}
 }
