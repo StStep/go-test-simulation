@@ -2,19 +2,13 @@ package formation
 
 import (
 	"fmt"
+	pr "github.com/StStep/go-test-simulation/internal/formationprop"
 	fl "gonum.org/v1/gonum/floats"
 	"strings"
 )
 
-type FormationProp struct {
-	style       string
-	width       int
-	fileSpacing float64
-	rankSpacing float64
-}
-
 type Formation struct {
-	Prop    *FormationProp
+	Prop    pr.FormationProp
 	size    int
 	capSlot int
 	slots   [][2]float64
@@ -22,9 +16,8 @@ type Formation struct {
 	isEmpty []bool
 }
 
-func NewFormation(style string, width int, fileSpacing float64, rankSpacing float64, size int) *Formation {
-	p := FormationProp{style, width, fileSpacing, rankSpacing}
-	f := Formation{Prop: &p}
+func NewFormation(prop pr.FormationProp, size int) *Formation {
+	f := Formation{Prop: prop}
 	f.Resize(size)
 	return &f
 }
@@ -41,12 +34,12 @@ func (f *Formation) Resize(size int) {
 	f.size = size
 
 	// Recalc positions
-	if f.Prop.style == "" {
+	if f.Prop.Style() == "" {
 		// Assuming standard block with captain in middle
-		ranks := f.size / f.Prop.width
-		hwidth := f.Prop.width - f.Prop.width/2 - 1
+		ranks := f.size / f.Prop.Width()
+		hwidth := f.Prop.Width() - f.Prop.Width()/2 - 1
 		hrank := ranks - ranks/2 - 1
-		f.capSlot = f.Prop.width*(hrank) + hwidth
+		f.capSlot = f.Prop.Width()*(hrank) + hwidth
 
 		for i := 0; i < f.size; i++ {
 			if i == f.capSlot {
@@ -54,9 +47,9 @@ func (f *Formation) Resize(size int) {
 				f.slots[i] = [2]float64{0.0, 0.0}
 			} else {
 				f.tags[i] = "Grunt"
-				fInd := i % f.Prop.width
-				rInd := i / f.Prop.width
-				f.slots[i] = [2]float64{float64(fInd-hwidth) * f.Prop.fileSpacing, float64(hrank-rInd) * f.Prop.rankSpacing}
+				fInd := i % f.Prop.Width()
+				rInd := i / f.Prop.Width()
+				f.slots[i] = [2]float64{float64(fInd-hwidth) * f.Prop.FileSpacing(), float64(hrank-rInd) * f.Prop.RankSpacing()}
 			}
 			f.isEmpty[i] = true
 		}
@@ -99,11 +92,11 @@ func (f *Formation) Offset(i int) [2]float64 {
 }
 
 func (f *Formation) DebugOffsets() string {
-	rows := make([]string, 0, f.size+f.size/f.Prop.width) // one per unit and per end-of-rank for \n
+	rows := make([]string, 0, f.size+f.size/f.Prop.Width()) // one per unit and per end-of-rank for \n
 	for i, v := range f.slots {
 		rows = append(rows, fmt.Sprint(v)+"\t")
 		// Append newline at end-of-ranks
-		if i%f.Prop.width == f.Prop.width-1 {
+		if i%f.Prop.Width() == f.Prop.Width()-1 {
 			rows = append(rows, "\n")
 		}
 	}
