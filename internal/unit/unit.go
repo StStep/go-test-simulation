@@ -8,19 +8,21 @@ import (
 	pr "github.com/StStep/go-test-simulation/internal/unitprop"
 )
 
+const (
+	CmdNil = 0
+)
+
 type Unit struct {
 	Prop          pr.UnitProp
 	Formation     *form.Formation
-	UnitCommand   chan int // TODO This probably isn't needed
 	EntityCommand chan int
 	Leader        *ent.Entity
 	Members       []*ent.Entity
 }
 
-func NewUnit(prop pr.UnitProp, cmd chan int, pos [2]float64, space *sp.Space, conf cf.Configuration) *Unit {
+func NewUnit(prop pr.UnitProp, pos [2]float64, space *sp.Space, conf cf.Configuration) *Unit {
 	u := Unit{Prop: prop}
 	u.Formation = form.NewFormation(conf.Formation(u.Prop.Formations()[0]), u.Prop.Size())
-	u.UnitCommand = cmd
 	u.EntityCommand = make(chan int)
 	if u.Prop.Leader() != "" {
 		u.Leader = ent.NewEntity(conf.Entity(u.Prop.Leader()), u.EntityCommand)
@@ -48,4 +50,9 @@ func (u *Unit) Size() int {
 	} else {
 		return base
 	}
+}
+
+// TODO Only give reform command to members
+func (u *Unit) GiveCommand(cmd int) {
+	u.EntityCommand <- ent.CmdReform
 }

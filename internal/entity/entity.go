@@ -6,6 +6,11 @@ import (
 	sp "github.com/StStep/go-test-simulation/internal/space"
 )
 
+const (
+	CmdNil    = 0
+	CmdReform = 1
+)
+
 type Entity struct {
 	Prop         pr.EntityProp
 	Movement     *mv.Movement
