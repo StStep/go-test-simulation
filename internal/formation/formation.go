@@ -7,9 +7,18 @@ import (
 	"strings"
 )
 
-// TODO Formation should be more generic?
-// How does it inter-relate with unit
-// Should slots still be a thing?
+// TODO Purpose of Formation
+//
+// Formation does the math derived from FormationProp and given info (size)
+// and provides interface for entities to be assign slots in it
+//
+// * Leader is important slots, all others reference it
+// * Want to work with offsets
+// * Consumed by Unit, members only know of assigned offset and orientation to leader
+// * Want to be able to trade slots, allow for the weak/tired to move to the back/center
+// * Need to be able to change FormationProps somehow, allow for reinitialization?
+// * Following logic is built around standard block formation with leader in center
+// * Need to allow for varying formation styles, such as square formation
 
 type Formation struct {
 	Prop    pr.FormationProp

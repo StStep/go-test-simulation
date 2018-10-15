@@ -35,7 +35,8 @@ func NewUnit(prop pr.UnitProp, cmd chan int, pos [2]float64, space *sp.Space, co
 		startPos := [2]float64{pos[0] + u.Members[i].Prop.Radius()*4, pos[1]}
 		u.Members[i].SpaceViewer, u.Members[i].SpaceUpdater =
 			space.Register(startPos, u.Members[i].Prop.Radius())
-		u.Members[i].FormOffset = [2]float64{0, 0} // TODO
+		// TODO pull info from Formation, currently making block with leader at top left
+		u.Members[i].FormOffset = [2]float64{float64((i + 1) % 5), float64((i + 1) / 5)}
 	}
 	return &u
 }
@@ -47,8 +48,4 @@ func (u *Unit) Size() int {
 	} else {
 		return base
 	}
-}
-
-func (u *Unit) UpdateMove(done chan bool) {
-	done <- false
 }
