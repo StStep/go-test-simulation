@@ -7,6 +7,10 @@ import (
 	"strings"
 )
 
+// TODO Formation should be more generic?
+// How does it inter-relate with unit
+// Should slots still be a thing?
+
 type Formation struct {
 	Prop    pr.FormationProp
 	size    int

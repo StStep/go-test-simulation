@@ -21,6 +21,30 @@ type Space struct {
 	loge      *logfmt.Encoder
 }
 
+type SpaceViewer interface {
+}
+
+type SpaceUpdater interface {
+}
+
+type viewer struct {
+	ref *Space
+	id  int
+}
+
+func NewSpaceViewer(ref *Space, id int) SpaceViewer {
+	return &viewer{ref, id}
+}
+
+type updater struct {
+	ref *Space
+	id  int
+}
+
+func NewSpaceUpdater(ref *Space, id int) SpaceUpdater {
+	return &updater{ref, id}
+}
+
 func NewSpace() *Space {
 	var s Space
 	s.positions = make(map[int][2]float64)
@@ -56,7 +80,12 @@ func (s *Space) Contains(id int) bool {
 	return ok1 && ok2 && ok3 && ok4
 }
 
-func (s *Space) RegisterEntity(pos [2]float64, radius float64) int {
+func (s *Space) Register(pos [2]float64, radius float64) (SpaceViewer, SpaceUpdater) {
+	id := s.registerEntity(pos, radius)
+	return NewSpaceViewer(s, id), NewSpaceUpdater(s, id)
+}
+
+func (s *Space) registerEntity(pos [2]float64, radius float64) int {
 	s.lastId += 1
 	s.positions[s.lastId] = pos
 	s.radii[s.lastId] = radius
@@ -74,7 +103,7 @@ func (s *Space) RegisterEntity(pos [2]float64, radius float64) int {
 }
 
 // TODO Invalidates prev collision check
-func (s *Space) UpdateEntity(id int, vel [2]float64) bool {
+func (s *Space) updateEntity(id int, vel [2]float64) bool {
 	_, ok := s.velocity[id]
 	if !ok {
 		return false
@@ -83,7 +112,7 @@ func (s *Space) UpdateEntity(id int, vel [2]float64) bool {
 	return true
 }
 
-func (s *Space) UnregisterEntity(id int) {
+func (s *Space) unregisterEntity(id int) {
 	// Delete id entries from maps
 	delete(s.positions, id)
 	delete(s.radii, id)

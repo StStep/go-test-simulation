@@ -11,7 +11,7 @@ import (
 type Unit struct {
 	Prop          pr.UnitProp
 	Formation     *form.Formation
-	UnitCommand   chan int
+	UnitCommand   chan int // TODO This probably isn't needed
 	EntityCommand chan int
 	Leader        *ent.Entity
 	Members       []*ent.Entity
@@ -24,7 +24,8 @@ func NewUnit(prop pr.UnitProp, cmd chan int, pos [2]float64, space *sp.Space, co
 	u.EntityCommand = make(chan int)
 	if u.Prop.Leader() != "" {
 		u.Leader = ent.NewEntity(conf.Entity(u.Prop.Leader()), u.EntityCommand)
-		u.Leader.SpaceId = space.RegisterEntity(pos, u.Leader.Prop.Radius())
+		u.Leader.SpaceViewer, u.Leader.SpaceUpdater = space.Register(pos, u.Leader.Prop.Radius())
+		u.Leader.FormOffset = [2]float64{0, 0}
 	} else {
 		u.Leader = nil
 	}
@@ -32,7 +33,9 @@ func NewUnit(prop pr.UnitProp, cmd chan int, pos [2]float64, space *sp.Space, co
 	for i := 0; i < u.Prop.Size(); i++ {
 		u.Members[i] = ent.NewEntity(conf.Entity(u.Prop.Members()[i]), u.EntityCommand)
 		startPos := [2]float64{pos[0] + u.Members[i].Prop.Radius()*4, pos[1]}
-		u.Members[i].SpaceId = space.RegisterEntity(startPos, u.Members[i].Prop.Radius())
+		u.Members[i].SpaceViewer, u.Members[i].SpaceUpdater =
+			space.Register(startPos, u.Members[i].Prop.Radius())
+		u.Members[i].FormOffset = [2]float64{0, 0} // TODO
 	}
 	return &u
 }

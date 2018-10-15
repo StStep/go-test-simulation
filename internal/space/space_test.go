@@ -22,14 +22,14 @@ func TestRegisteration(t *testing.T) {
 	for i, v := range tables {
 		s := NewSpace()
 		for k := 0; k < v.count; k++ {
-			assert.Equalf(k+1, s.RegisterEntity(v.pos, v.radius), "Test %v", i)
-			assert.Truef(s.UpdateEntity(k+1, v.vel), "Test %v", i)
+			assert.Equalf(k+1, s.registerEntity(v.pos, v.radius), "Test %v", i)
+			assert.Truef(s.updateEntity(k+1, v.vel), "Test %v", i)
 			assert.Truef(s.Contains(k+1), "Test %v", i)
 		}
 		assert.Equalf(v.expCount, s.EntityCount(), "Test %v", i)
 
 		for k := 0; k < v.count; k++ {
-			s.UnregisterEntity(k + 1)
+			s.unregisterEntity(k + 1)
 			assert.Falsef(s.Contains(k+1), "Test %v", i)
 		}
 		assert.Equalf(0, s.EntityCount(), "Test %v", i)
@@ -52,18 +52,18 @@ func TestUpdateEntity(t *testing.T) {
 	for i, v := range tables {
 		s := NewSpace()
 		for k := 0; k < v.count; k++ {
-			assert.Equalf(k+1, s.RegisterEntity([2]float64{}, 0), "Test %v", i)
+			assert.Equalf(k+1, s.registerEntity([2]float64{}, 0), "Test %v", i)
 		}
 		if v.exp {
-			assert.Truef(s.UpdateEntity(v.id, v.vel), "Test %v", i)
+			assert.Truef(s.updateEntity(v.id, v.vel), "Test %v", i)
 			vel := s.velocity[v.id]
 			assert.InDeltaSlicef(vel[:], v.vel[:], 0.01, "Test %v", i)
 		} else {
-			assert.Falsef(s.UpdateEntity(v.id, v.vel), "Test %v", i)
+			assert.Falsef(s.updateEntity(v.id, v.vel), "Test %v", i)
 		}
 
 		for k := 0; k < v.count; k++ {
-			s.UnregisterEntity(k + 1)
+			s.unregisterEntity(k + 1)
 		}
 		assert.Equalf(0, s.EntityCount(), "Test %v", i)
 	}
@@ -84,8 +84,8 @@ func TestStep(t *testing.T) {
 
 	for i, v := range tables {
 		s := NewSpace()
-		s.RegisterEntity(v.startPos, 0)
-		s.UpdateEntity(1, v.vel)
+		s.registerEntity(v.startPos, 0)
+		s.updateEntity(1, v.vel)
 
 		for k := 0; k < v.steps; k++ {
 			s.Step(v.stepSize)
@@ -114,7 +114,7 @@ func TestCollisions(t *testing.T) {
 		s := NewSpace()
 
 		for k := 0; k < len(v.poss); k++ {
-			s.RegisterEntity(v.poss[k], v.radii[k])
+			s.registerEntity(v.poss[k], v.radii[k])
 		}
 		coll := s.Collisions()
 
