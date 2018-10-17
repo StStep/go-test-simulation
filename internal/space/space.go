@@ -21,9 +21,12 @@ type Space struct {
 	loge      *logfmt.Encoder
 }
 
+// TODO Implement for use by entities
+// Need GUID for entities
 type SpaceViewer interface {
 }
 
+// TODO Implement for use by entities
 type SpaceUpdater interface {
 }
 

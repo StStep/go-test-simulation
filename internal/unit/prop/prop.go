@@ -2,7 +2,7 @@ package unitprop
 
 import ()
 
-type UnitProp interface {
+type Prop interface {
 	Name() string
 	Leader() string
 	Members() []string
@@ -16,7 +16,7 @@ type prop struct {
 	members, formations []string
 }
 
-func NewEntityProp(name string, leader string, members []string, formations []string) UnitProp {
+func NewProp(name string, leader string, members []string, formations []string) Prop {
 	return &prop{name, leader, members, formations}
 }
 

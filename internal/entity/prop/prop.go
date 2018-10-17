@@ -1,11 +1,11 @@
-package entityprop
+package prop
 
 import (
 	mpr "github.com/StStep/go-test-simulation/internal/movementprop"
 )
 
 // TODO Could decorate props with modifiers? Or decorate with a sturct allowing modifiers?
-type EntityProp interface {
+type Prop interface {
 	Name() string
 	Movement() mpr.MovementProp
 	Radius() float64
@@ -17,7 +17,7 @@ type prop struct {
 	radius   float64
 }
 
-func NewEntityProp(name string, movement mpr.MovementProp, radius float64) EntityProp {
+func NewProp(name string, movement mpr.MovementProp, radius float64) Prop {
 	return &prop{name, movement, radius}
 }
 
