@@ -1,11 +1,11 @@
 package concrete
 
 import (
-	cf "github.com/StStep/go-test-simulation/internal/configuration"
+	conf "github.com/StStep/go-test-simulation/internal/configuration"
 	ent "github.com/StStep/go-test-simulation/internal/entity"
 	form "github.com/StStep/go-test-simulation/internal/formation"
 	"github.com/StStep/go-test-simulation/internal/id"
-	sp "github.com/StStep/go-test-simulation/internal/space"
+	"github.com/StStep/go-test-simulation/internal/ledger"
 	"github.com/StStep/go-test-simulation/internal/unit"
 	pr "github.com/StStep/go-test-simulation/internal/unit/prop"
 )
@@ -13,6 +13,13 @@ import (
 const (
 	CmdNil = 0
 )
+
+type constructor struct {
+	db        ledger.LedgerRO
+	conf      conf.Configuration
+	idgen     id.UidGen
+	entConstr ent.EntityConstructor
+}
 
 type concrete struct {
 	prop          pr.Prop
@@ -23,26 +30,35 @@ type concrete struct {
 	members       []ent.Entity
 }
 
-func NewUnit(prop pr.Prop, pos [2]float64, space *sp.Space, conf cf.Configuration) unit.Unit {
-	u := concrete{prop: prop}
-	u.formation = form.NewFormation(conf.Formation(u.prop.Formations()[0]), u.prop.Size())
-	u.entityCommand = make(chan int)
+func NewConstructor(db ledger.LedgerRO, conf conf.Configuration,
+	idgen id.UidGen, entConstr ent.EntityConstructor) unit.UnitConstructor {
+	return &constructor{db: db, conf: conf, idgen: idgen, entConstr: entConstr}
+}
+
+func (c *constructor) New(name string, pos [2]float64) unit.Unit {
+	prop := c.conf.Unit(name)
+	u := concrete{
+		prop:          prop,
+		id:            c.idgen.Id(),
+		formation:     form.NewFormation(c.conf.Formation(prop.Formations()[0]), prop.Size()),
+		entityCommand: make(chan int),
+		leader:        nil,
+		members:       make([]ent.Entity, prop.Size()),
+	}
+
+	// Leader
 	if u.prop.Leader() != "" {
-		//u.leader = ent.NewEntity(conf.Entity(u.prop.Leader()), u.EntityCommand)
-		//u.leader.SpaceViewer, u.Leader.SpaceUpdater = space.Register(pos, u.Leader.Prop.Radius())
-		//u.leader.FormOffset = [2]float64{0, 0}
-	} else {
-		u.leader = nil
+		u.leader = c.entConstr.New(u.prop.Leader(), u.entityCommand, pos, [2]float64{0, 0})
 	}
-	u.members = make([]ent.Entity, u.prop.Size())
+
+	// Member
 	for i := 0; i < u.prop.Size(); i++ {
-		//u.Members[i] = ent.NewEntity(conf.Entity(u.Prop.Members()[i]), u.EntityCommand)
-		//startPos := [2]float64{pos[0] + u.Members[i].Prop.Radius()*4, pos[1]}
-		//u.Members[i].SpaceViewer, u.Members[i].SpaceUpdater =
-		//	space.Register(startPos, u.Members[i].Prop.Radius())
-		//// TODO pull info from Formation, currently making block with leader at top left
-		//u.Members[i].FormOffset = [2]float64{float64((i + 1) % 5), float64((i + 1) / 5)}
+		// TODO pull info from Formation, currently making block with leader at top left
+		startPos := [2]float64{pos[0] + float64(i)*2.0, pos[1]}
+		formOffset := [2]float64{float64((i + 1) % 5), float64((i + 1) / 5)}
+		u.members[i] = c.entConstr.New(u.prop.Members()[i], u.entityCommand, startPos, formOffset)
 	}
+
 	return &u
 }
 
@@ -57,9 +73,4 @@ func (u *concrete) Size() int {
 	} else {
 		return base
 	}
-}
-
-// TODO Only give reform command to members
-func (u *concrete) GiveCommand(cmd int) {
-	u.entityCommand <- ent.CmdReform
 }

@@ -6,6 +6,11 @@ import (
 	un "github.com/StStep/go-test-simulation/internal/unit"
 )
 
+type LedgerRO interface {
+	Unit(id id.Uid) un.Unit
+	Entity(id id.Eid) ent.Entity
+}
+
 type Ledger interface {
 	Unit(id id.Uid) un.Unit
 	Entity(id id.Eid) ent.Entity

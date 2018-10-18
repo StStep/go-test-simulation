@@ -23,11 +23,11 @@ type Space struct {
 
 // TODO Implement for use by entities
 // Need GUID for entities
-type SpaceViewer interface {
+type Viewer interface {
 }
 
 // TODO Implement for use by entities
-type SpaceUpdater interface {
+type Updater interface {
 }
 
 type viewer struct {
@@ -35,7 +35,7 @@ type viewer struct {
 	id  int
 }
 
-func NewSpaceViewer(ref *Space, id int) SpaceViewer {
+func NewViewer(ref *Space, id int) Viewer {
 	return &viewer{ref, id}
 }
 
@@ -44,7 +44,7 @@ type updater struct {
 	id  int
 }
 
-func NewSpaceUpdater(ref *Space, id int) SpaceUpdater {
+func NewUpdater(ref *Space, id int) Updater {
 	return &updater{ref, id}
 }
 
@@ -83,9 +83,9 @@ func (s *Space) Contains(id int) bool {
 	return ok1 && ok2 && ok3 && ok4
 }
 
-func (s *Space) Register(pos [2]float64, radius float64) (SpaceViewer, SpaceUpdater) {
+func (s *Space) Register(pos [2]float64, radius float64) (Viewer, Updater) {
 	id := s.registerEntity(pos, radius)
-	return NewSpaceViewer(s, id), NewSpaceUpdater(s, id)
+	return NewViewer(s, id), NewUpdater(s, id)
 }
 
 func (s *Space) registerEntity(pos [2]float64, radius float64) int {

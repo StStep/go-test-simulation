@@ -2,8 +2,8 @@ package configuration
 
 import (
 	ent "github.com/StStep/go-test-simulation/internal/entity/prop"
-	un "github.com/StStep/go-test-simulation/internal/unit/prop"
 	form "github.com/StStep/go-test-simulation/internal/formationprop"
+	un "github.com/StStep/go-test-simulation/internal/unit/prop"
 )
 
 type Configuration interface {
@@ -21,7 +21,7 @@ func NewConfiguration() Configuration {
 
 type conf struct {
 	entities   map[string]ent.Prop
-	units   map[string]un.Prop
+	units      map[string]un.Prop
 	formations map[string]form.FormationProp
 }
 
