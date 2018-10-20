@@ -22,12 +22,13 @@ type constructor struct {
 }
 
 type concrete struct {
+	db            ledger.LedgerRO
 	prop          pr.Prop
 	id            id.Uid
 	formation     *form.Formation
 	entityCommand chan int
-	leader        ent.Entity
-	members       []ent.Entity
+	guide         id.Eid
+	members       []id.Eid
 }
 
 func NewConstructor(db ledger.LedgerRO, conf conf.Configuration,
@@ -35,42 +36,49 @@ func NewConstructor(db ledger.LedgerRO, conf conf.Configuration,
 	return &constructor{db: db, conf: conf, idgen: idgen, entConstr: entConstr}
 }
 
-func (c *constructor) New(name string, pos [2]float64) unit.Unit {
+func (c *constructor) New(name string, pos [2]float64) (unit.Unit, []ent.Entity) {
 	prop := c.conf.Unit(name)
 	u := concrete{
+		db:            c.db,
 		prop:          prop,
 		id:            c.idgen.Id(),
 		formation:     form.NewFormation(c.conf.Formation(prop.Formations()[0]), prop.Size()),
 		entityCommand: make(chan int),
-		leader:        nil,
-		members:       make([]ent.Entity, prop.Size()),
+		guide:         0,
+		members:       make([]id.Eid, prop.Size()),
 	}
 
-	// Leader
-	if u.prop.Leader() != "" {
-		u.leader = c.entConstr.New(u.prop.Leader(), u.entityCommand, pos, [2]float64{0, 0})
+	// TODO pull info from Formation, currently making block with leader at top left
+	k := 0
+	entRet := make([]ent.Entity, prop.Size())
+	for name, count := range u.Prop().Members() {
+		for i := 0; i < count; i++ {
+			startPos := [2]float64{pos[0] + float64(k)*2.0, pos[1]}
+			formOffset := [2]float64{float64(k % 5), float64(k / 5)}
+			entRet[k] = c.entConstr.New(name, u.entityCommand, startPos, formOffset)
+			u.members[k] = entRet[k].Id()
+			if k == 0 {
+				u.guide = u.members[k]
+			}
+			k++
+		}
 	}
 
-	// Member
-	for i := 0; i < u.prop.Size(); i++ {
-		// TODO pull info from Formation, currently making block with leader at top left
-		startPos := [2]float64{pos[0] + float64(i)*2.0, pos[1]}
-		formOffset := [2]float64{float64((i + 1) % 5), float64((i + 1) / 5)}
-		u.members[i] = c.entConstr.New(u.prop.Members()[i], u.entityCommand, startPos, formOffset)
-	}
-
-	return &u
+	return &u, entRet
 }
 
 func (u *concrete) Id() id.Uid {
 	return u.id
 }
 
+func (u *concrete) Prop() pr.Prop {
+	return u.prop
+}
+
 func (u *concrete) Size() int {
-	base := len(u.members)
-	if u.leader != nil {
-		return base + 1
-	} else {
-		return base
-	}
+	return len(u.members)
+}
+
+func (u *concrete) Guide() id.Eid {
+	return u.guide
 }

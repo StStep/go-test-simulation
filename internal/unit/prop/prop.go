@@ -4,19 +4,19 @@ import ()
 
 type Prop interface {
 	Name() string
-	Leader() string
-	Members() []string
+	Members() map[string]int
 	Formations() []string
 	Size() int
 }
 
 type prop struct {
-	name                string
-	leader              string
-	members, formations []string
+	name       string
+	leader     string
+	members    map[string]int
+	formations []string
 }
 
-func NewProp(name string, leader string, members []string, formations []string) Prop {
+func NewProp(name string, leader string, members map[string]int, formations []string) Prop {
 	return &prop{name, leader, members, formations}
 }
 
@@ -24,11 +24,7 @@ func (p *prop) Name() string {
 	return p.name
 }
 
-func (p *prop) Leader() string {
-	return p.leader
-}
-
-func (p *prop) Members() []string {
+func (p *prop) Members() map[string]int {
 	return p.members
 }
 
@@ -37,10 +33,9 @@ func (p *prop) Formations() []string {
 }
 
 func (p *prop) Size() int {
-	base := len(p.Members())
-	if p.Leader() != "" {
-		return base + 1
-	} else {
-		return base
+	ret := 0
+	for _, v := range p.Members() {
+		ret = ret + v
 	}
+	return ret
 }
