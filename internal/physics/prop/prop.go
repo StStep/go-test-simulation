@@ -1,6 +1,6 @@
-package movementprop
+package prop
 
-type MovementProp interface {
+type Prop interface {
 	MaxVelocity() [4]float64
 	Acceleration() [4]float64
 	Deceleration() [4]float64
@@ -8,6 +8,7 @@ type MovementProp interface {
 	BaseEnergyUsage() [4]float64
 	TurnRadiusRate() float64
 	BaseTurnRadius() float64
+	FootprintRadius() float64
 	TurnRateAt(speed float64) float64
 }
 
@@ -16,10 +17,11 @@ type prop struct {
 	acceleration, deceleration       [4]float64
 	energyUsageRate, baseEnergyUsage [4]float64
 	turnRadiusRate, baseTurnRadius   float64
+	footprintRadius                  float64
 }
 
-func NewMovementProp(maxVel [4]float64, accel [4]float64, decel [4]float64, enRate [4]float64, enBase [4]float64, turnRate float64, turnBase float64) MovementProp {
-	return &prop{maxVel, accel, decel, enRate, enBase, turnRate, turnBase}
+func NewProp(maxVel [4]float64, accel [4]float64, decel [4]float64, enRate [4]float64, enBase [4]float64, turnRate float64, turnBase float64, radius float64) Prop {
+	return &prop{maxVel, accel, decel, enRate, enBase, turnRate, turnBase, radius}
 }
 
 func (p *prop) MaxVelocity() [4]float64 {
@@ -48,6 +50,10 @@ func (p *prop) TurnRadiusRate() float64 {
 
 func (p *prop) BaseTurnRadius() float64 {
 	return p.baseTurnRadius
+}
+
+func (p *prop) FootprintRadius() float64 {
+	return p.footprintRadius
 }
 
 func (p *prop) TurnRateAt(speed float64) float64 {

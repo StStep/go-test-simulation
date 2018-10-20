@@ -1,27 +1,31 @@
-package movement
+package inertia
 
 import (
-	pr "github.com/StStep/go-test-simulation/internal/movementprop"
+	pr "github.com/StStep/go-test-simulation/internal/physics/prop"
 	fl "gonum.org/v1/gonum/floats"
 )
 
-type Movement struct {
-	Prop        pr.MovementProp // Movement properties to use with math
-	curVelocity [2]float64      // Represents current velocity vector
-	cmdVelocity [2]float64      // Represents commanded velocity vector
+type Inertia struct {
+	Prop        pr.Prop    // Physics properties to use with math
+	curVelocity [2]float64 // Represents current velocity vector
+	cmdVelocity [2]float64 // Represents commanded velocity vector
 }
 
 // Forward, Backward, Right, Left
-func NewMovement(prop pr.MovementProp) *Movement {
-	return &Movement{Prop: prop}
+func NewInertia(prop pr.Prop) *Inertia {
+	return &Inertia{Prop: prop}
 }
 
 // Turn rate used for setting arc for current direction
-func (m *Movement) TurnRate() float64 {
+func (m *Inertia) TurnRate() float64 {
 	return m.Prop.TurnRateAt(fl.Norm(m.curVelocity[:], 2))
 }
 
-func (m *Movement) Command() ([2]float64, float64) {
+func (m *Inertia) Velocity() [2]float64 {
+	return m.cmdVelocity
+}
+
+func (m *Inertia) Command() ([2]float64, float64) {
 	t := m.cmdVelocity[:]
 	speed := fl.Norm(t, 2)
 	fl.Scale(1/speed, t)
@@ -30,7 +34,7 @@ func (m *Movement) Command() ([2]float64, float64) {
 }
 
 // dir[1] > 0 ? Front : Back; dir[0] > 0 ? Right : Left
-func (m *Movement) SetCommand(dir [2]float64, speed float64) {
+func (m *Inertia) SetCommand(dir [2]float64, speed float64) {
 	// Set to unit vector if not already
 	fl.Scale(1/fl.Norm(dir[:], 2), dir[:])
 
@@ -61,7 +65,7 @@ func (m *Movement) SetCommand(dir [2]float64, speed float64) {
 	fl.Scale(adjSpeed, m.cmdVelocity[:])
 }
 
-func (m *Movement) Update(del float64) float64 {
+func (m *Inertia) Update(del float64) {
 	var diff [2]float64
 	fl.SubTo(diff[:], m.curVelocity[:], m.cmdVelocity[:])
 
@@ -121,7 +125,4 @@ func (m *Movement) Update(del float64) float64 {
 
 	// Update vel
 	fl.AddTo(m.curVelocity[:], []float64{hdiff, vdiff}, m.cmdVelocity[:])
-
-	// TODO figure out return
-	return 0
 }

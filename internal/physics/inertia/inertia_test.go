@@ -1,7 +1,7 @@
-package movement
+package inertia
 
 import (
-	pr "github.com/StStep/go-test-simulation/internal/movementprop"
+	pr "github.com/StStep/go-test-simulation/internal/physics/prop"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )
@@ -30,7 +30,7 @@ func TestSetCommand(t *testing.T) {
 	}
 
 	for i, v := range tables {
-		m := NewMovement(pr.NewMovementProp([4]float64{4, 1, 3, 2}, [4]float64{}, [4]float64{}, [4]float64{}, [4]float64{}, 0, 0))
+		m := NewInertia(pr.NewProp([4]float64{4, 1, 3, 2}, [4]float64{}, [4]float64{}, [4]float64{}, [4]float64{}, 0, 0, 0))
 		m.SetCommand(v.dir, v.cmdSpeed)
 		dir, speed := m.Command()
 		assert.InDeltaSlicef(v.expDir[:], dir[:], 0.01, "Test %v", i)
@@ -56,7 +56,7 @@ func TestTurnRate(t *testing.T) {
 	}
 
 	for i, v := range tables {
-		m := NewMovement(pr.NewMovementProp([4]float64{}, [4]float64{}, [4]float64{}, [4]float64{}, [4]float64{}, v.rate, v.baseRadius))
+		m := NewInertia(pr.NewProp([4]float64{}, [4]float64{}, [4]float64{}, [4]float64{}, [4]float64{}, v.rate, v.baseRadius, 0))
 		m.curVelocity = [2]float64{0, v.speed}
 		assert.InDeltaf(v.expTurnRadius, m.Prop.TurnRateAt(v.speed), 0.01, "Test %v", i)
 		assert.InDeltaf(v.expTurnRadius, m.TurnRate(), 0.01, "Test %v", i)
@@ -82,7 +82,7 @@ func TestUpdate(t *testing.T) {
 	}
 
 	for i, v := range tables {
-		m := NewMovement(pr.NewMovementProp([4]float64{4, 1, 3, 2}, [4]float64{4 / 4, 1 / 4, 3 / 4, 2 / 4}, [4]float64{4 / 8, 1 / 8, 3 / 8, 2 / 8}, [4]float64{}, [4]float64{}, 0, 0))
+		m := NewInertia(pr.NewProp([4]float64{4, 1, 3, 2}, [4]float64{4 / 4, 1 / 4, 3 / 4, 2 / 4}, [4]float64{4 / 8, 1 / 8, 3 / 8, 2 / 8}, [4]float64{}, [4]float64{}, 0, 0, 0))
 		m.SetCommand(v.dir, v.cmdSpeed)
 
 		for i := 0; i < v.upCount; i++ {

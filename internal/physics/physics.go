@@ -6,6 +6,8 @@ package space
 import (
 	"fmt"
 	"github.com/StStep/go-test-simulation/internal/id"
+	"github.com/StStep/go-test-simulation/internal/physics/inertia"
+	pr "github.com/StStep/go-test-simulation/internal/physics/prop"
 	"github.com/go-logfmt/logfmt"
 	fl "gonum.org/v1/gonum/floats"
 	"io"
@@ -13,8 +15,8 @@ import (
 
 type Space interface {
 	Step(del float64)
-	RegisterEntity(id id.Eid, pos [2]float64, radius float64)
-	UpdateEntity(id id.Eid, vel [2]float64) bool
+	RegisterEntity(id id.Eid, prop pr.Prop, pos [2]float64)
+	UpdateEntity(id id.Eid, dir [2]float64, speed float64)
 	UnregisterEntity(id id.Eid)
 	Contains(id id.Eid) bool
 	EntityCount() int
@@ -26,9 +28,9 @@ type Space interface {
 
 type space struct {
 	ids       []id.Eid
+	inertia   map[id.Eid]*inertia.Inertia
 	positions map[id.Eid][2]float64
 	radii     map[id.Eid]float64
-	velocity  map[id.Eid][2]float64
 	cvalid    bool
 	ccolls    [][2]id.Eid
 	loge      *logfmt.Encoder
@@ -37,9 +39,9 @@ type space struct {
 func NewSpace() Space {
 	var s space
 	s.ids = make([]id.Eid, 0)
+	s.inertia = make(map[id.Eid]*inertia.Inertia)
 	s.positions = make(map[id.Eid][2]float64)
 	s.radii = make(map[id.Eid]float64)
-	s.velocity = make(map[id.Eid][2]float64)
 	s.cvalid = false
 	s.ccolls = make([][2]id.Eid, 0)
 	s.loge = nil
@@ -58,7 +60,7 @@ func (s *space) EntityCount() int {
 func (s *space) Contains(id id.Eid) bool {
 	_, ok1 := s.positions[id]
 	_, ok2 := s.radii[id]
-	_, ok3 := s.velocity[id]
+	_, ok3 := s.inertia[id]
 	ok4 := false
 	for _, v := range s.ids {
 		if v == id {
@@ -69,36 +71,31 @@ func (s *space) Contains(id id.Eid) bool {
 	return ok1 && ok2 && ok3 && ok4
 }
 
-func (s *space) RegisterEntity(id id.Eid, pos [2]float64, radius float64) {
+func (s *space) RegisterEntity(id id.Eid, prop pr.Prop, pos [2]float64) {
 	s.positions[id] = pos
-	s.radii[id] = radius
-	s.velocity[id] = [2]float64{}
+	s.radii[id] = prop.FootprintRadius()
+	s.inertia[id] = inertia.NewInertia(prop)
 	s.ids = append(s.ids, id)
 	if s.loge != nil {
 		s.loge.EncodeKeyval("tag", "add")
 		s.loge.EncodeKeyval("id", id)
 		s.loge.EncodeKeyval("shape", "circle")
 		s.loge.EncodeKeyval("pos", fmt.Sprintf("%v,%v", pos[0], pos[1]))
-		s.loge.EncodeKeyval("radius", radius)
+		s.loge.EncodeKeyval("radius", s.radii[id])
 		s.loge.EndRecord()
 	}
 }
 
 // TODO Invalidates prev collision check
-func (s *space) UpdateEntity(id id.Eid, vel [2]float64) bool {
-	_, ok := s.velocity[id]
-	if !ok {
-		return false
-	}
-	s.velocity[id] = vel
-	return true
+func (s *space) UpdateEntity(id id.Eid, dir [2]float64, speed float64) {
+	s.inertia[id].SetCommand(dir, speed)
 }
 
 func (s *space) UnregisterEntity(id id.Eid) {
 	// Delete id entries from maps
 	delete(s.positions, id)
 	delete(s.radii, id)
-	delete(s.velocity, id)
+	delete(s.inertia, id)
 
 	// Remove id from list
 	for i, v := range s.ids {
@@ -118,8 +115,9 @@ func (s *space) Step(del float64) {
 
 	// Calc for each
 	for _, v := range s.ids {
+		s.inertia[v].Update(del)
 		pos := s.positions[v]
-		vel := s.velocity[v]
+		vel := s.inertia[v].Velocity()
 		svel := vel[:]
 		fl.Scale(del, svel)
 		fl.Add(pos[:], svel)
@@ -146,7 +144,7 @@ func (s *space) Position(id id.Eid) [2]float64 {
 }
 
 func (s *space) Velocity(id id.Eid) [2]float64 {
-	return s.velocity[id]
+	return s.inertia[id].Velocity()
 }
 
 func (s *space) Collisions() [][2]id.Eid {
