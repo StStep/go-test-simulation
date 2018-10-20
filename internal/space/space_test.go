@@ -1,6 +1,7 @@
 package space
 
 import (
+	"github.com/StStep/go-test-simulation/internal/id"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )
@@ -22,15 +23,17 @@ func TestRegisteration(t *testing.T) {
 	for i, v := range tables {
 		s := NewSpace()
 		for k := 0; k < v.count; k++ {
-			assert.Equalf(k+1, s.registerEntity(v.pos, v.radius), "Test %v", i)
-			assert.Truef(s.updateEntity(k+1, v.vel), "Test %v", i)
-			assert.Truef(s.Contains(k+1), "Test %v", i)
+			id := id.Eid(k + 1)
+			s.RegisterEntity(id, v.pos, v.radius)
+			assert.Truef(s.UpdateEntity(id, v.vel), "Test %v", i)
+			assert.Truef(s.Contains(id), "Test %v", i)
 		}
 		assert.Equalf(v.expCount, s.EntityCount(), "Test %v", i)
 
 		for k := 0; k < v.count; k++ {
-			s.unregisterEntity(k + 1)
-			assert.Falsef(s.Contains(k+1), "Test %v", i)
+			id := id.Eid(k + 1)
+			s.UnregisterEntity(id)
+			assert.Falsef(s.Contains(id), "Test %v", i)
 		}
 		assert.Equalf(0, s.EntityCount(), "Test %v", i)
 	}
@@ -41,29 +44,29 @@ func TestUpdateEntity(t *testing.T) {
 
 	tables := []struct {
 		count int
-		id    int
+		id    id.Eid
 		vel   [2]float64
 		exp   bool
 	}{
-		{4, 1, [2]float64{2, 5}, true},  // Standard usage
-		{4, 5, [2]float64{1, 2}, false}, // Unknown ID error
+		{4, id.Eid(1), [2]float64{2, 5}, true},  // Standard usage
+		{4, id.Eid(5), [2]float64{1, 2}, false}, // Unknown ID error
 	}
 
 	for i, v := range tables {
 		s := NewSpace()
 		for k := 0; k < v.count; k++ {
-			assert.Equalf(k+1, s.registerEntity([2]float64{}, 0), "Test %v", i)
+			s.RegisterEntity(id.Eid(k+1), [2]float64{}, 0)
 		}
 		if v.exp {
-			assert.Truef(s.updateEntity(v.id, v.vel), "Test %v", i)
-			vel := s.velocity[v.id]
+			assert.Truef(s.UpdateEntity(v.id, v.vel), "Test %v", i)
+			vel := s.Velocity(v.id)
 			assert.InDeltaSlicef(vel[:], v.vel[:], 0.01, "Test %v", i)
 		} else {
-			assert.Falsef(s.updateEntity(v.id, v.vel), "Test %v", i)
+			assert.Falsef(s.UpdateEntity(v.id, v.vel), "Test %v", i)
 		}
 
 		for k := 0; k < v.count; k++ {
-			s.unregisterEntity(k + 1)
+			s.UnregisterEntity(id.Eid(k + 1))
 		}
 		assert.Equalf(0, s.EntityCount(), "Test %v", i)
 	}
@@ -84,13 +87,14 @@ func TestStep(t *testing.T) {
 
 	for i, v := range tables {
 		s := NewSpace()
-		s.registerEntity(v.startPos, 0)
-		s.updateEntity(1, v.vel)
+		id := id.Eid(1)
+		s.RegisterEntity(id, v.startPos, 0)
+		s.UpdateEntity(id, v.vel)
 
 		for k := 0; k < v.steps; k++ {
 			s.Step(v.stepSize)
 		}
-		pos := s.positions[1]
+		pos := s.Position(id)
 		assert.InDeltaSlicef(v.expPos[:], pos[:], 0.01, "Test %v: Exp %v Pos %v", i, v.expPos, pos)
 	}
 }
@@ -101,20 +105,20 @@ func TestCollisions(t *testing.T) {
 	tables := []struct {
 		poss    [][2]float64
 		radii   []float64
-		expColl [][2]int
+		expColl [][2]id.Eid
 	}{
 		{[][2]float64{[2]float64{0, 0}, [2]float64{2, 0}}, []float64{1, 1.5},
-			[][2]int{[2]int{1, 2}}}, // Simple Collision
+			[][2]id.Eid{[2]id.Eid{1, 2}}}, // Simple Collision
 		{[][2]float64{[2]float64{0, 0}, [2]float64{2, 0}, [2]float64{0, 1}}, []float64{1, 1.5, 2},
-			[][2]int{[2]int{1, 2}, [2]int{1, 3}, [2]int{2, 3}}}, // Double Collision
-		{[][2]float64{[2]float64{0, 0}, [2]float64{2, 0}}, []float64{1, 0.5}, [][2]int{}}, // No Collision
+			[][2]id.Eid{[2]id.Eid{1, 2}, [2]id.Eid{1, 3}, [2]id.Eid{2, 3}}}, // Double Collision
+		{[][2]float64{[2]float64{0, 0}, [2]float64{2, 0}}, []float64{1, 0.5}, [][2]id.Eid{}}, // No Collision
 	}
 
 	for i, v := range tables {
 		s := NewSpace()
 
 		for k := 0; k < len(v.poss); k++ {
-			s.registerEntity(v.poss[k], v.radii[k])
+			s.RegisterEntity(id.Eid(k+1), v.poss[k], v.radii[k])
 		}
 		coll := s.Collisions()
 

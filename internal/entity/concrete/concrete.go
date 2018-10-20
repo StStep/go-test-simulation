@@ -21,8 +21,7 @@ type concrete struct {
 	prop       pr.Prop
 	id         id.Eid
 	movement   *mv.Movement
-	viewer     space.Viewer  // Use to See others in same space
-	updater    space.Updater // Use to move self around
+	space      space.Space
 	command    chan int
 	formOffset [2]float64
 }
@@ -33,16 +32,16 @@ func NewConstructor(db ledger.LedgerRO, conf conf.Configuration, idgen id.EidGen
 
 func (c *constructor) New(name string, cmd chan int, pos [2]float64, offset [2]float64) entity.Entity {
 	prop := c.conf.Entity(name)
-	viewer, updater := c.space.Register(pos, prop.Radius())
-	return &concrete{
+	e := concrete{
 		prop:       prop,
 		id:         c.idgen.Id(),
 		movement:   mv.NewMovement(prop.Movement()),
-		viewer:     viewer,
-		updater:    updater,
+		space:      c.space,
 		command:    cmd,
 		formOffset: offset,
 	}
+	c.space.RegisterEntity(e.id, pos, prop.Radius())
+	return &e
 }
 
 func (e *concrete) Prop() pr.Prop {
