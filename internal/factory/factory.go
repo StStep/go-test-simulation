@@ -10,7 +10,7 @@ import (
 	unitc "github.com/StStep/go-test-simulation/internal/unit/concrete"
 )
 
-func NewFactory(db ledger.LedgerRO, conf conf.Configuration, phy physics.Physics, uidgen id.UidGen, eidgen id.EidGen) unit.UnitConstructor {
+func New(db ledger.LedgerRO, conf conf.Configuration, phy physics.Physics, uidgen id.UidGen, eidgen id.EidGen) unit.UnitConstructor {
 	econstr := entc.NewConstructor(db, conf, eidgen, phy)
 	uconstr := unitc.NewConstructor(db, conf, uidgen, econstr)
 	return uconstr
