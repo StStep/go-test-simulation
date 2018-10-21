@@ -14,5 +14,5 @@ type Unit interface {
 	Id() id.Uid
 	Prop() pr.Prop
 	Size() int
-	Guide() id.Eid
+	Guide() [2]float64
 }

@@ -1,4 +1,4 @@
-package space
+package physics
 
 import (
 	"github.com/StStep/go-test-simulation/internal/id"
@@ -20,7 +20,7 @@ func TestRegisteration(t *testing.T) {
 
 	for i, v := range tables {
 		prop := pr.NewProp([4]float64{}, [4]float64{}, [4]float64{}, [4]float64{}, [4]float64{}, 0, 0, 0)
-		s := NewSpace()
+		s := NewPhysics()
 		for k := 0; k < v.count; k++ {
 			id := id.Eid(k + 1)
 			s.RegisterEntity(id, prop, [2]float64{0, 0})
@@ -55,7 +55,7 @@ func TestStep(t *testing.T) {
 
 	for i, v := range tables {
 		prop := pr.NewProp([4]float64{10, 10, 10, 10}, [4]float64{10, 10, 10, 10}, [4]float64{}, [4]float64{}, [4]float64{}, 0, 0, 0)
-		s := NewSpace()
+		s := NewPhysics()
 		id := id.Eid(1)
 		s.RegisterEntity(id, prop, v.startPos)
 		s.UpdateEntity(id, v.dir, v.speed)
@@ -86,7 +86,7 @@ func TestCollisions(t *testing.T) {
 	}
 
 	for i, v := range tables {
-		s := NewSpace()
+		s := NewPhysics()
 
 		for k := 0; k < len(v.poss); k++ {
 			prop := pr.NewProp([4]float64{}, [4]float64{}, [4]float64{}, [4]float64{}, [4]float64{}, 0, 0, v.radii[k])

@@ -55,7 +55,7 @@ func (c *constructor) New(name string, pos [2]float64) (unit.Unit, []ent.Entity)
 		for i := 0; i < count; i++ {
 			startPos := [2]float64{pos[0] + float64(k)*2.0, pos[1]}
 			formOffset := [2]float64{float64(k % 5), float64(k / 5)}
-			entRet[k] = c.entConstr.New(name, u.entityCommand, startPos, formOffset)
+			entRet[k] = c.entConstr.New(name, u.Id(), u.entityCommand, startPos, formOffset)
 			u.members[k] = entRet[k].Id()
 			if k == 0 {
 				u.guide = u.members[k]
@@ -79,6 +79,6 @@ func (u *concrete) Size() int {
 	return len(u.members)
 }
 
-func (u *concrete) Guide() id.Eid {
-	return u.guide
+func (u *concrete) Guide() [2]float64 {
+	return u.db.Entity(u.guide).Position()
 }

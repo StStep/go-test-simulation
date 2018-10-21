@@ -1,32 +1,32 @@
 package prop
 
 import (
-	mpr "github.com/StStep/go-test-simulation/internal/movementprop"
+	phy "github.com/StStep/go-test-simulation/internal/physics/prop"
 )
 
 // TODO Could decorate props with modifiers? Or decorate with a sturct allowing modifiers?
 type Prop interface {
 	Name() string
-	Movement() mpr.MovementProp
+	Physics() phy.Prop
 	Radius() float64
 }
 
 type prop struct {
-	name     string
-	movement mpr.MovementProp
-	radius   float64
+	name   string
+	phy    phy.Prop
+	radius float64
 }
 
-func NewProp(name string, movement mpr.MovementProp, radius float64) Prop {
-	return &prop{name, movement, radius}
+func NewProp(name string, phy phy.Prop, radius float64) Prop {
+	return &prop{name, phy, radius}
 }
 
 func (p *prop) Name() string {
 	return p.name
 }
 
-func (p *prop) Movement() mpr.MovementProp {
-	return p.movement
+func (p *prop) Physics() phy.Prop {
+	return p.phy
 }
 
 func (p *prop) Radius() float64 {

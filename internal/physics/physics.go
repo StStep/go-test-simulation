@@ -1,4 +1,4 @@
-package space
+package physics
 
 // TODO Consider optimizing, see https://cstheory.stackexchange.com/questions/16927/efficient-algorithm-to-find-overlapping-circles-of-various-sizes
 // Note: Leaves control of velocity in hands of updater, only provides collision information, doesn't enforce it
@@ -13,7 +13,7 @@ import (
 	"io"
 )
 
-type Space interface {
+type Physics interface {
 	Step(del float64)
 	RegisterEntity(id id.Eid, prop pr.Prop, pos [2]float64)
 	UpdateEntity(id id.Eid, dir [2]float64, speed float64)
@@ -26,7 +26,7 @@ type Space interface {
 	SetLogOutput(out io.Writer)
 }
 
-type space struct {
+type physics struct {
 	ids       []id.Eid
 	inertia   map[id.Eid]*inertia.Inertia
 	positions map[id.Eid][2]float64
@@ -36,8 +36,8 @@ type space struct {
 	loge      *logfmt.Encoder
 }
 
-func NewSpace() Space {
-	var s space
+func NewPhysics() Physics {
+	var s physics
 	s.ids = make([]id.Eid, 0)
 	s.inertia = make(map[id.Eid]*inertia.Inertia)
 	s.positions = make(map[id.Eid][2]float64)
@@ -49,15 +49,15 @@ func NewSpace() Space {
 	return &s
 }
 
-func (s *space) SetLogOutput(out io.Writer) {
+func (s *physics) SetLogOutput(out io.Writer) {
 	s.loge = logfmt.NewEncoder(out)
 }
 
-func (s *space) EntityCount() int {
+func (s *physics) EntityCount() int {
 	return len(s.positions)
 }
 
-func (s *space) Contains(id id.Eid) bool {
+func (s *physics) Contains(id id.Eid) bool {
 	_, ok1 := s.positions[id]
 	_, ok2 := s.radii[id]
 	_, ok3 := s.inertia[id]
@@ -71,7 +71,7 @@ func (s *space) Contains(id id.Eid) bool {
 	return ok1 && ok2 && ok3 && ok4
 }
 
-func (s *space) RegisterEntity(id id.Eid, prop pr.Prop, pos [2]float64) {
+func (s *physics) RegisterEntity(id id.Eid, prop pr.Prop, pos [2]float64) {
 	s.positions[id] = pos
 	s.radii[id] = prop.FootprintRadius()
 	s.inertia[id] = inertia.NewInertia(prop)
@@ -87,11 +87,11 @@ func (s *space) RegisterEntity(id id.Eid, prop pr.Prop, pos [2]float64) {
 }
 
 // TODO Invalidates prev collision check
-func (s *space) UpdateEntity(id id.Eid, dir [2]float64, speed float64) {
+func (s *physics) UpdateEntity(id id.Eid, dir [2]float64, speed float64) {
 	s.inertia[id].SetCommand(dir, speed)
 }
 
-func (s *space) UnregisterEntity(id id.Eid) {
+func (s *physics) UnregisterEntity(id id.Eid) {
 	// Delete id entries from maps
 	delete(s.positions, id)
 	delete(s.radii, id)
@@ -106,7 +106,7 @@ func (s *space) UnregisterEntity(id id.Eid) {
 	}
 }
 
-func (s *space) Step(del float64) {
+func (s *physics) Step(del float64) {
 
 	if s.loge != nil {
 		s.loge.EncodeKeyval("tag", "step")
@@ -139,15 +139,15 @@ func (s *space) Step(del float64) {
 	s.ccolls = s.ccolls[:0]
 }
 
-func (s *space) Position(id id.Eid) [2]float64 {
+func (s *physics) Position(id id.Eid) [2]float64 {
 	return s.positions[id]
 }
 
-func (s *space) Velocity(id id.Eid) [2]float64 {
+func (s *physics) Velocity(id id.Eid) [2]float64 {
 	return s.inertia[id].Velocity()
 }
 
-func (s *space) Collisions() [][2]id.Eid {
+func (s *physics) Collisions() [][2]id.Eid {
 	// Send cached if valid
 	if s.cvalid {
 		return s.ccolls
@@ -170,7 +170,7 @@ func (s *space) Collisions() [][2]id.Eid {
 }
 
 // TODO Return collision list filtered for specific ID
-func (s *space) EntityCollisions(id int) []int {
+func (s *physics) EntityCollisions(id int) []int {
 	return []int{}
 }
 
@@ -178,11 +178,11 @@ func (s *space) EntityCollisions(id int) []int {
 // 1. Compare currnet dist, radii and movement distance to see if collision is even possible
 // 2. Comparing relative velocity and current distance to know if conflict could happen
 // 3. Finally do detailed check to see if overlapping will occur?
-func (s *space) ProjectedCollisions() [][2]int {
+func (s *physics) ProjectedCollisions() [][2]int {
 	return [][2]int{}
 }
 
 // TODO Return projected collision list filtered for specific ID
-func (s *space) ProjectedEntityCollisions(id int) []int {
+func (s *physics) ProjectedEntityCollisions(id int) []int {
 	return []int{}
 }
