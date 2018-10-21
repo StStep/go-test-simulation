@@ -19,4 +19,6 @@ type Entity interface {
 	Prop() prop.Prop
 	Position() [2]float64
 	Velocity() [2]float64
+	FormError() (dir [2]float64, dist float64)
+	LogicStep(del float64)
 }

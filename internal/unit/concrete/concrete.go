@@ -82,3 +82,9 @@ func (u *concrete) Size() int {
 func (u *concrete) Guide() [2]float64 {
 	return u.db.Entity(u.guide).Position()
 }
+
+func (e *concrete) LogicStep(del float64) {
+	for _, v := range e.members {
+		e.db.Entity(v).LogicStep(del)
+	}
+}

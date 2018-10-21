@@ -86,7 +86,7 @@ func TestUpdate(t *testing.T) {
 		m.SetCommand(v.dir, v.cmdSpeed)
 
 		for i := 0; i < v.upCount; i++ {
-			m.Update(v.del)
+			m.PhyStep(v.del)
 		}
 
 		assert.InDeltaSlicef(v.expVel[:], m.curVelocity[:], 0.01, "Test %v", i)

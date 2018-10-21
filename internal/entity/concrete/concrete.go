@@ -7,6 +7,7 @@ import (
 	"github.com/StStep/go-test-simulation/internal/id"
 	"github.com/StStep/go-test-simulation/internal/ledger"
 	"github.com/StStep/go-test-simulation/internal/physics"
+	fl "gonum.org/v1/gonum/floats"
 )
 
 type constructor struct {
@@ -17,6 +18,7 @@ type constructor struct {
 }
 
 type concrete struct {
+	db         ledger.LedgerRO
 	prop       pr.Prop
 	id         id.Eid
 	unit       id.Uid
@@ -32,6 +34,7 @@ func NewConstructor(db ledger.LedgerRO, conf conf.Configuration, idgen id.EidGen
 func (c *constructor) New(name string, uid id.Uid, cmd chan int, pos [2]float64, offset [2]float64) entity.Entity {
 	prop := c.conf.Entity(name)
 	e := concrete{
+		db:         c.db,
 		prop:       prop,
 		id:         c.idgen.Id(),
 		unit:       uid,
@@ -50,11 +53,29 @@ func (e *concrete) Prop() pr.Prop {
 func (e *concrete) Id() id.Eid {
 	return e.id
 }
+
 func (e *concrete) Position() [2]float64 {
 	return e.physics.Position(e.Id())
 }
 
 func (e *concrete) Velocity() [2]float64 {
-	// TODO
-	return [2]float64{0, 0}
+	return e.physics.Velocity(e.Id())
+}
+
+func (e *concrete) FormError() (dir [2]float64, dist float64) {
+	g := e.db.Unit(e.unit).Guide()
+	pos := e.physics.Position(e.Id())
+	fl.Sub(g[:], pos[:])
+	dist = fl.Norm(g[:], 2)
+	dir = g
+	fl.Scale(1/dist, dir[:])
+	return
+}
+
+func (e *concrete) LogicStep(del float64) {
+	// TODO Currently only setting CmdVel depending upon offset and pos
+	dir, dist := e.FormError()
+
+	// TODO Shouldn't use dist as speed, just rough placeholder
+	e.physics.SetCommand(e.Id(), dir, dist)
 }

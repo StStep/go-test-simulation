@@ -65,7 +65,7 @@ func (m *Inertia) SetCommand(dir [2]float64, speed float64) {
 	fl.Scale(adjSpeed, m.cmdVelocity[:])
 }
 
-func (m *Inertia) Update(del float64) {
+func (m *Inertia) PhyStep(del float64) {
 	var diff [2]float64
 	fl.SubTo(diff[:], m.curVelocity[:], m.cmdVelocity[:])
 
@@ -123,6 +123,6 @@ func (m *Inertia) Update(del float64) {
 		vdiff = 0
 	}
 
-	// Update vel
+	// PhyStep  vel
 	fl.AddTo(m.curVelocity[:], []float64{hdiff, vdiff}, m.cmdVelocity[:])
 }

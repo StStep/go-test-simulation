@@ -15,4 +15,5 @@ type Unit interface {
 	Prop() pr.Prop
 	Size() int
 	Guide() [2]float64
+	LogicStep(del float64)
 }

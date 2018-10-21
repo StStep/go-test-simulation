@@ -24,7 +24,7 @@ func TestRegisteration(t *testing.T) {
 		for k := 0; k < v.count; k++ {
 			id := id.Eid(k + 1)
 			s.RegisterEntity(id, prop, [2]float64{0, 0})
-			s.UpdateEntity(id, [2]float64{0, 0}, 0)
+			s.SetCommand(id, [2]float64{0, 0}, 0)
 			assert.Truef(s.Contains(id), "Test %v", i)
 		}
 		assert.Equalf(v.expCount, s.EntityCount(), "Test %v", i)
@@ -58,7 +58,7 @@ func TestStep(t *testing.T) {
 		s := NewPhysics()
 		id := id.Eid(1)
 		s.RegisterEntity(id, prop, v.startPos)
-		s.UpdateEntity(id, v.dir, v.speed)
+		s.SetCommand(id, v.dir, v.speed)
 
 		for k := 0; k < v.steps; k++ {
 			s.Step(v.stepSize)

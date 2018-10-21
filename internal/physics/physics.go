@@ -16,7 +16,8 @@ import (
 type Physics interface {
 	Step(del float64)
 	RegisterEntity(id id.Eid, prop pr.Prop, pos [2]float64)
-	UpdateEntity(id id.Eid, dir [2]float64, speed float64)
+	Command(id id.Eid) (dir [2]float64, speed float64)
+	SetCommand(id id.Eid, dir [2]float64, speed float64)
 	UnregisterEntity(id id.Eid)
 	Contains(id id.Eid) bool
 	EntityCount() int
@@ -86,8 +87,11 @@ func (s *physics) RegisterEntity(id id.Eid, prop pr.Prop, pos [2]float64) {
 	}
 }
 
-// TODO Invalidates prev collision check
-func (s *physics) UpdateEntity(id id.Eid, dir [2]float64, speed float64) {
+func (s *physics) Command(id id.Eid) (dir [2]float64, speed float64) {
+	return s.inertia[id].Command()
+}
+
+func (s *physics) SetCommand(id id.Eid, dir [2]float64, speed float64) {
 	s.inertia[id].SetCommand(dir, speed)
 }
 
@@ -115,9 +119,9 @@ func (s *physics) Step(del float64) {
 
 	// Calc for each
 	for _, v := range s.ids {
-		s.inertia[v].Update(del)
+		s.inertia[v].PhyStep(del)
 		pos := s.positions[v]
-		vel := s.inertia[v].Velocity()
+		vel := s.Velocity(v)
 		svel := vel[:]
 		fl.Scale(del, svel)
 		fl.Add(pos[:], svel)
@@ -129,6 +133,9 @@ func (s *physics) Step(del float64) {
 			s.loge.EncodeKeyval("tag", "update")
 			s.loge.EncodeKeyval("id", v)
 			s.loge.EncodeKeyval("pos", fmt.Sprintf("%v,%v", pos[0], pos[1]))
+			cmddir, cmdspeed := s.Command(v)
+			s.loge.EncodeKeyval("cmddir", fmt.Sprintf("%v,%v", cmddir[0], cmddir[1]))
+			s.loge.EncodeKeyval("cmdspeed", cmdspeed)
 			s.loge.EncodeKeyval("vel", fmt.Sprintf("%v,%v", vel[0], vel[1]))
 			s.loge.EndRecord()
 		}
