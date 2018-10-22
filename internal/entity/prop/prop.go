@@ -11,23 +11,23 @@ type Prop interface {
 	Radius() float64
 }
 
-type prop struct {
-	name string
-	phy  phy.Prop
+type Pprop struct {
+	Pname string     `json:"name"`
+	Pphy  *phy.Pprop `json:"physics"`
 }
 
-func New(name string, phy phy.Prop) Prop {
-	return &prop{name, phy}
+func New(name string, phy *phy.Pprop) *Pprop {
+	return &Pprop{name, phy}
 }
 
-func (p *prop) Name() string {
-	return p.name
+func (p *Pprop) Name() string {
+	return p.Pname
 }
 
-func (p *prop) Physics() phy.Prop {
-	return p.phy
+func (p *Pprop) Physics() phy.Prop {
+	return p.Pphy
 }
 
-func (p *prop) Radius() float64 {
-	return p.phy.FootprintRadius()
+func (p *Pprop) Radius() float64 {
+	return p.Pphy.FootprintRadius()
 }

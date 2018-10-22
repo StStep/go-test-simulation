@@ -7,29 +7,29 @@ type FormationProp interface {
 	RankSpacing() float64
 }
 
-type prop struct {
-	style       string
-	width       int
-	fileSpacing float64
-	rankSpacing float64
+type Pprop struct {
+	Pstyle       string  `json:"style"`
+	Pwidth       int     `json:"width"`
+	PfileSpacing float64 `json:"fileSpacing"`
+	PrankSpacing float64 `json:"rankSpacing"`
 }
 
-func NewFormationProp(style string, width int, fileSpacing float64, rankSpacing float64) FormationProp {
-	return &prop{style, width, fileSpacing, rankSpacing}
+func NewFormationProp(Pstyle string, Pwidth int, PfileSpacing float64, PrankSpacing float64) *Pprop {
+	return &Pprop{Pstyle, Pwidth, PfileSpacing, PrankSpacing}
 }
 
-func (p *prop) Style() string {
-	return p.style
+func (p *Pprop) Style() string {
+	return p.Pstyle
 }
 
-func (p *prop) Width() int {
-	return p.width
+func (p *Pprop) Width() int {
+	return p.Pwidth
 }
 
-func (p *prop) FileSpacing() float64 {
-	return p.fileSpacing
+func (p *Pprop) FileSpacing() float64 {
+	return p.PfileSpacing
 }
 
-func (p *prop) RankSpacing() float64 {
-	return p.rankSpacing
+func (p *Pprop) RankSpacing() float64 {
+	return p.PrankSpacing
 }

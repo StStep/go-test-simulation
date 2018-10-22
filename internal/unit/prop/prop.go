@@ -1,4 +1,4 @@
-package unitprop
+package prop
 
 import ()
 
@@ -9,29 +9,29 @@ type Prop interface {
 	Size() int
 }
 
-type prop struct {
-	name       string
-	members    map[string]int
-	formations []string
+type Pprop struct {
+	Pname       string         `json:"name"`
+	Pmembers    map[string]int `json:"members"`
+	Pformations []string       `json:"formations"`
 }
 
-func New(name string, members map[string]int, formations []string) Prop {
-	return &prop{name, members, formations}
+func New(name string, members map[string]int, formations []string) *Pprop {
+	return &Pprop{name, members, formations}
 }
 
-func (p *prop) Name() string {
-	return p.name
+func (p *Pprop) Name() string {
+	return p.Pname
 }
 
-func (p *prop) Members() map[string]int {
-	return p.members
+func (p *Pprop) Members() map[string]int {
+	return p.Pmembers
 }
 
-func (p *prop) Formations() []string {
-	return p.formations
+func (p *Pprop) Formations() []string {
+	return p.Pformations
 }
 
-func (p *prop) Size() int {
+func (p *Pprop) Size() int {
 	ret := 0
 	for _, v := range p.Members() {
 		ret = ret + v

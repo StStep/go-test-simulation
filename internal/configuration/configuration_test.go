@@ -22,13 +22,13 @@ func TestFile(t *testing.T) {
 		[4]float64{},
 		0, 0,
 		0.25)
-	config.entities["swordman"] = ent.New("swordman", pConf)
+	config.Entities["swordman"] = ent.New("swordman", pConf)
 
-	config.formations[""] = form.NewFormationProp("", 5, 0.5, 0.5)
+	config.Formations[""] = form.NewFormationProp("", 5, 0.5, 0.5)
 
 	membs := make(map[string]int)
 	membs["swordman"] = 20
-	config.units["swords"] = un.New("swords", membs, []string{""})
+	config.Units["swords"] = un.New("swords", membs, []string{""})
 
 	c := Configuration(config)
 
