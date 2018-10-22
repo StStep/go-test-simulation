@@ -12,13 +12,12 @@ type Prop interface {
 }
 
 type prop struct {
-	name   string
-	phy    phy.Prop
-	radius float64
+	name string
+	phy  phy.Prop
 }
 
-func NewProp(name string, phy phy.Prop, radius float64) Prop {
-	return &prop{name, phy, radius}
+func New(name string, phy phy.Prop) Prop {
+	return &prop{name, phy}
 }
 
 func (p *prop) Name() string {
@@ -30,5 +29,5 @@ func (p *prop) Physics() phy.Prop {
 }
 
 func (p *prop) Radius() float64 {
-	return p.radius
+	return p.phy.FootprintRadius()
 }

@@ -11,13 +11,12 @@ type Prop interface {
 
 type prop struct {
 	name       string
-	leader     string
 	members    map[string]int
 	formations []string
 }
 
-func NewProp(name string, leader string, members map[string]int, formations []string) Prop {
-	return &prop{name, leader, members, formations}
+func New(name string, members map[string]int, formations []string) Prop {
+	return &prop{name, members, formations}
 }
 
 func (p *prop) Name() string {

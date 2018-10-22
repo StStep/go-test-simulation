@@ -20,7 +20,7 @@ type prop struct {
 	footprintRadius                  float64
 }
 
-func NewProp(maxVel [4]float64, accel [4]float64, decel [4]float64, enRate [4]float64, enBase [4]float64, turnRate float64, turnBase float64, radius float64) Prop {
+func New(maxVel [4]float64, accel [4]float64, decel [4]float64, enRate [4]float64, enBase [4]float64, turnRate float64, turnBase float64, radius float64) Prop {
 	return &prop{maxVel, accel, decel, enRate, enBase, turnRate, turnBase, radius}
 }
 
