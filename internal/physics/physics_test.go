@@ -19,8 +19,8 @@ func TestRegisteration(t *testing.T) {
 	}
 
 	for i, v := range tables {
-		prop := pr.New([4]float64{}, [4]float64{}, [4]float64{}, [4]float64{}, [4]float64{}, 0, 0, 0)
-		s := NewPhysics()
+		prop := &pr.Prop{[4]float64{}, [4]float64{}, [4]float64{}, [4]float64{}, [4]float64{}, 0, 0, 0}
+		s := New()
 		for k := 0; k < v.count; k++ {
 			id := id.Eid(k + 1)
 			s.RegisterEntity(id, prop, [2]float64{0, 0})
@@ -54,8 +54,8 @@ func TestStep(t *testing.T) {
 	}
 
 	for i, v := range tables {
-		prop := pr.New([4]float64{10, 10, 10, 10}, [4]float64{10, 10, 10, 10}, [4]float64{}, [4]float64{}, [4]float64{}, 0, 0, 0)
-		s := NewPhysics()
+		prop := &pr.Prop{[4]float64{10, 10, 10, 10}, [4]float64{10, 10, 10, 10}, [4]float64{}, [4]float64{}, [4]float64{}, 0, 0, 0}
+		s := New()
 		id := id.Eid(1)
 		s.RegisterEntity(id, prop, v.startPos)
 		s.SetCommand(id, v.dir, v.speed)
@@ -86,10 +86,10 @@ func TestCollisions(t *testing.T) {
 	}
 
 	for i, v := range tables {
-		s := NewPhysics()
+		s := New()
 
 		for k := 0; k < len(v.poss); k++ {
-			prop := pr.New([4]float64{}, [4]float64{}, [4]float64{}, [4]float64{}, [4]float64{}, 0, 0, v.radii[k])
+			prop := &pr.Prop{[4]float64{}, [4]float64{}, [4]float64{}, [4]float64{}, [4]float64{}, 0, 0, v.radii[k]}
 			s.RegisterEntity(id.Eid(k+1), prop, v.poss[k])
 		}
 		coll := s.Collisions()

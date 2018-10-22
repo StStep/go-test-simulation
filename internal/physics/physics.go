@@ -13,21 +13,7 @@ import (
 	"io"
 )
 
-type Physics interface {
-	Step(del float64)
-	RegisterEntity(id id.Eid, prop pr.Prop, pos [2]float64)
-	Command(id id.Eid) (dir [2]float64, speed float64)
-	SetCommand(id id.Eid, dir [2]float64, speed float64)
-	UnregisterEntity(id id.Eid)
-	Contains(id id.Eid) bool
-	EntityCount() int
-	Position(id id.Eid) [2]float64
-	Velocity(id id.Eid) [2]float64
-	Collisions() [][2]id.Eid
-	SetLogOutput(out io.Writer)
-}
-
-type physics struct {
+type Physics struct {
 	ids       []id.Eid
 	inertia   map[id.Eid]*inertia.Inertia
 	positions map[id.Eid][2]float64
@@ -37,8 +23,8 @@ type physics struct {
 	loge      *logfmt.Encoder
 }
 
-func NewPhysics() Physics {
-	var s physics
+func New() *Physics {
+	var s Physics
 	s.ids = make([]id.Eid, 0)
 	s.inertia = make(map[id.Eid]*inertia.Inertia)
 	s.positions = make(map[id.Eid][2]float64)
@@ -50,15 +36,15 @@ func NewPhysics() Physics {
 	return &s
 }
 
-func (s *physics) SetLogOutput(out io.Writer) {
+func (s *Physics) SetLogOutput(out io.Writer) {
 	s.loge = logfmt.NewEncoder(out)
 }
 
-func (s *physics) EntityCount() int {
+func (s *Physics) EntityCount() int {
 	return len(s.positions)
 }
 
-func (s *physics) Contains(id id.Eid) bool {
+func (s *Physics) Contains(id id.Eid) bool {
 	_, ok1 := s.positions[id]
 	_, ok2 := s.radii[id]
 	_, ok3 := s.inertia[id]
@@ -72,9 +58,9 @@ func (s *physics) Contains(id id.Eid) bool {
 	return ok1 && ok2 && ok3 && ok4
 }
 
-func (s *physics) RegisterEntity(id id.Eid, prop pr.Prop, pos [2]float64) {
+func (s *Physics) RegisterEntity(id id.Eid, prop *pr.Prop, pos [2]float64) {
 	s.positions[id] = pos
-	s.radii[id] = prop.FootprintRadius()
+	s.radii[id] = prop.FootprintRadius
 	s.inertia[id] = inertia.NewInertia(prop)
 	s.ids = append(s.ids, id)
 	if s.loge != nil {
@@ -87,15 +73,15 @@ func (s *physics) RegisterEntity(id id.Eid, prop pr.Prop, pos [2]float64) {
 	}
 }
 
-func (s *physics) Command(id id.Eid) (dir [2]float64, speed float64) {
+func (s *Physics) Command(id id.Eid) (dir [2]float64, speed float64) {
 	return s.inertia[id].Command()
 }
 
-func (s *physics) SetCommand(id id.Eid, dir [2]float64, speed float64) {
+func (s *Physics) SetCommand(id id.Eid, dir [2]float64, speed float64) {
 	s.inertia[id].SetCommand(dir, speed)
 }
 
-func (s *physics) UnregisterEntity(id id.Eid) {
+func (s *Physics) UnregisterEntity(id id.Eid) {
 	// Delete id entries from maps
 	delete(s.positions, id)
 	delete(s.radii, id)
@@ -110,7 +96,7 @@ func (s *physics) UnregisterEntity(id id.Eid) {
 	}
 }
 
-func (s *physics) Step(del float64) {
+func (s *Physics) Step(del float64) {
 
 	if s.loge != nil {
 		s.loge.EncodeKeyval("tag", "step")
@@ -146,15 +132,15 @@ func (s *physics) Step(del float64) {
 	s.ccolls = s.ccolls[:0]
 }
 
-func (s *physics) Position(id id.Eid) [2]float64 {
+func (s *Physics) Position(id id.Eid) [2]float64 {
 	return s.positions[id]
 }
 
-func (s *physics) Velocity(id id.Eid) [2]float64 {
+func (s *Physics) Velocity(id id.Eid) [2]float64 {
 	return s.inertia[id].Velocity()
 }
 
-func (s *physics) Collisions() [][2]id.Eid {
+func (s *Physics) Collisions() [][2]id.Eid {
 	// Send cached if valid
 	if s.cvalid {
 		return s.ccolls
@@ -177,7 +163,7 @@ func (s *physics) Collisions() [][2]id.Eid {
 }
 
 // TODO Return collision list filtered for specific ID
-func (s *physics) EntityCollisions(id int) []int {
+func (s *Physics) EntityCollisions(id int) []int {
 	return []int{}
 }
 
@@ -185,11 +171,11 @@ func (s *physics) EntityCollisions(id int) []int {
 // 1. Compare currnet dist, radii and movement distance to see if collision is even possible
 // 2. Comparing relative velocity and current distance to know if conflict could happen
 // 3. Finally do detailed check to see if overlapping will occur?
-func (s *physics) ProjectedCollisions() [][2]int {
+func (s *Physics) ProjectedCollisions() [][2]int {
 	return [][2]int{}
 }
 
 // TODO Return projected collision list filtered for specific ID
-func (s *physics) ProjectedEntityCollisions(id int) []int {
+func (s *Physics) ProjectedEntityCollisions(id int) []int {
 	return []int{}
 }

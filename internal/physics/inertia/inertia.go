@@ -6,13 +6,13 @@ import (
 )
 
 type Inertia struct {
-	Prop        pr.Prop    // Physics properties to use with math
+	Prop        *pr.Prop   // Physics properties to use with math
 	curVelocity [2]float64 // Represents current velocity vector
 	cmdVelocity [2]float64 // Represents commanded velocity vector
 }
 
 // Forward, Backward, Right, Left
-func NewInertia(prop pr.Prop) *Inertia {
+func NewInertia(prop *pr.Prop) *Inertia {
 	return &Inertia{Prop: prop}
 }
 
@@ -41,17 +41,17 @@ func (m *Inertia) SetCommand(dir [2]float64, speed float64) {
 	// Check max horizantal velocity
 	hsp := dir[0]
 	if hsp > 0 {
-		hsp *= m.Prop.MaxVelocity()[2]
+		hsp *= m.Prop.MaxVelocity[2]
 	} else {
-		hsp *= m.Prop.MaxVelocity()[3]
+		hsp *= m.Prop.MaxVelocity[3]
 	}
 
 	// Check max vertical max velocity
 	vsp := dir[1]
 	if vsp > 0 {
-		vsp *= m.Prop.MaxVelocity()[0]
+		vsp *= m.Prop.MaxVelocity[0]
 	} else {
-		vsp *= m.Prop.MaxVelocity()[1]
+		vsp *= m.Prop.MaxVelocity[1]
 	}
 
 	// Cap based on calc max
@@ -83,12 +83,12 @@ func (m *Inertia) PhyStep(del float64) {
 
 	hdiff := diff[0]
 	if hdiff > 0 {
-		hdiff -= m.Prop.Deceleration()[hind] * del
+		hdiff -= m.Prop.Deceleration[hind] * del
 		if hdiff < 0 {
 			hdiff = 0
 		}
 	} else if hdiff < 0 {
-		hdiff += m.Prop.Acceleration()[hind] * del
+		hdiff += m.Prop.Acceleration[hind] * del
 		if hdiff > 0 {
 			hdiff = 0
 		}
@@ -110,12 +110,12 @@ func (m *Inertia) PhyStep(del float64) {
 
 	vdiff := diff[1]
 	if vdiff > 0 {
-		vdiff -= m.Prop.Deceleration()[vind] * del
+		vdiff -= m.Prop.Deceleration[vind] * del
 		if vdiff < 0 {
 			vdiff = 0
 		}
 	} else if vdiff < 0 {
-		vdiff += m.Prop.Acceleration()[vind] * del
+		vdiff += m.Prop.Acceleration[vind] * del
 		if vdiff > 0 {
 			vdiff = 0
 		}

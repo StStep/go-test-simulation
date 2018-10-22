@@ -1,24 +1,20 @@
 package entity
 
 import (
-	"github.com/StStep/go-test-simulation/internal/entity/prop"
 	"github.com/StStep/go-test-simulation/internal/id"
+	phy "github.com/StStep/go-test-simulation/internal/physics/prop"
 )
 
-const (
-	CmdNil    = 0
-	CmdReform = 1
-)
-
-type EntityConstructor interface {
-	New(name string, uid id.Uid, cmd chan int, pos [2]float64, offset [2]float64) Entity
+type Entity struct {
+	Id         id.Eid
+	Prop       *Prop
+	Unit       id.Uid
+	Command    chan int
+	FormOffset [2]float64
 }
 
-type Entity interface {
-	Id() id.Eid
-	Prop() prop.Prop
-	Position() [2]float64
-	Velocity() [2]float64
-	FormError() (dir [2]float64, dist float64)
-	LogicStep(del float64)
+// TODO Could decorate props with modifiers? Or decorate with a sturct allowing modifiers?
+type Prop struct {
+	Name    string    `json:"name"`
+	Physics *phy.Prop `json:"physics"`
 }

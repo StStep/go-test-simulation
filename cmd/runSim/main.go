@@ -4,8 +4,8 @@ import (
 	_ "github.com/StStep/go-test-simulation/internal/configuration"
 	_ "github.com/StStep/go-test-simulation/internal/factory"
 	_ "github.com/StStep/go-test-simulation/internal/id"
-	_ "github.com/StStep/go-test-simulation/internal/ledger"
 	_ "github.com/StStep/go-test-simulation/internal/physics"
+	_ "github.com/StStep/go-test-simulation/internal/state"
 )
 
 func check(err error) {

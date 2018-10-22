@@ -1,10 +1,10 @@
 package configuration
 
 import (
-	ent "github.com/StStep/go-test-simulation/internal/entity/prop"
-	form "github.com/StStep/go-test-simulation/internal/formationprop"
+	ent "github.com/StStep/go-test-simulation/internal/entity"
+	form "github.com/StStep/go-test-simulation/internal/formation"
 	phy "github.com/StStep/go-test-simulation/internal/physics/prop"
-	un "github.com/StStep/go-test-simulation/internal/unit/prop"
+	un "github.com/StStep/go-test-simulation/internal/unit"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )
@@ -12,25 +12,23 @@ import (
 func TestFile(t *testing.T) {
 	assert := assert.New(t)
 
-	config := newConf()
+	config := New()
 
-	pConf := phy.New(
+	pConf := &phy.Prop{
 		[4]float64{5, 5, 5, 5},
 		[4]float64{5, 5, 5, 5},
 		[4]float64{5, 5, 5, 5},
 		[4]float64{},
 		[4]float64{},
 		0, 0,
-		0.25)
-	config.Entities["swordman"] = ent.New("swordman", pConf)
+		0.25}
+	config.Entities["swordman"] = &ent.Prop{"swordman", pConf}
 
-	config.Formations[""] = form.NewFormationProp("", 5, 0.5, 0.5)
+	config.Formations[""] = &form.Prop{"", 5, 0.5, 0.5}
 
 	membs := make(map[string]int)
 	membs["swordman"] = 20
-	config.Units["swords"] = un.New("swords", membs, []string{""})
-
-	c := Configuration(config)
+	config.Units["swords"] = &un.Prop{"swords", membs, []string{""}}
 
 	tables := []struct {
 		wpath  string
@@ -43,12 +41,12 @@ func TestFile(t *testing.T) {
 
 	for i, v := range tables {
 		if v.wpanic {
-			assert.Panicsf(func() { c.ToFile(v.wpath) }, "Test %v: No panic", i)
+			assert.Panicsf(func() { config.ToFile(v.wpath) }, "Test %v: No panic", i)
 		} else {
-			assert.NotPanicsf(func() { c.ToFile(v.wpath) }, "Test %v: Panic", i)
+			assert.NotPanicsf(func() { config.ToFile(v.wpath) }, "Test %v: Panic", i)
 		}
 
-		var n Configuration
+		var n *Configuration
 		if v.rpanic {
 			assert.Panicsf(func() { FromFile(v.rpath) }, "Test %v: No panic", i)
 		} else {
@@ -56,7 +54,7 @@ func TestFile(t *testing.T) {
 		}
 
 		if !v.wpanic && !v.rpanic {
-			assert.Equalf(c, n, "Test %v: Not Equal", i)
+			assert.Equalf(config, n, "Test %v: Not Equal", i)
 		}
 	}
 }

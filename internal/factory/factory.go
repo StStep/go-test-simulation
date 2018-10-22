@@ -1,17 +1,55 @@
 package factory
 
 import (
-	conf "github.com/StStep/go-test-simulation/internal/configuration"
-	entc "github.com/StStep/go-test-simulation/internal/entity/concrete"
+	_ "github.com/StStep/go-test-simulation/internal/configuration"
+	ent "github.com/StStep/go-test-simulation/internal/entity"
 	"github.com/StStep/go-test-simulation/internal/id"
-	"github.com/StStep/go-test-simulation/internal/ledger"
-	"github.com/StStep/go-test-simulation/internal/physics"
-	unit "github.com/StStep/go-test-simulation/internal/unit"
-	unitc "github.com/StStep/go-test-simulation/internal/unit/concrete"
+	_ "github.com/StStep/go-test-simulation/internal/physics"
+	"github.com/StStep/go-test-simulation/internal/state"
+	un "github.com/StStep/go-test-simulation/internal/unit"
 )
 
-func New(db ledger.LedgerRO, conf conf.Configuration, phy physics.Physics, uidgen id.UidGen, eidgen id.EidGen) unit.UnitConstructor {
-	econstr := entc.NewConstructor(db, conf, eidgen, phy)
-	uconstr := unitc.NewConstructor(db, conf, uidgen, econstr)
-	return uconstr
+func NewEntity(state *state.State, name string, uid id.Uid, cmd chan int, pos [2]float64, offset [2]float64) *ent.Entity {
+	//	prop := state.Configuration.Entities[name]
+	//	e := ent.Entity{
+	//		Id:         state.EidGen.Id(),
+	//		Prop:       prop,
+	//		Unit:       uid,
+	//		Command:    cmd,
+	//		FormOffset: offset,
+	//	}
+	//	state.Physics.RegisterEntity(e.Id, prop.Physics, pos)
+	//	return &e
+	return nil
+}
+
+func NewUnit(state *state.State, name string, pos [2]float64) (un.Unit, []ent.Entity) {
+	//	prop := state.Configuration.Units[name]
+	//	u := un.Unit{
+	//		Id:            state.Uidgen.Id(),
+	//		Prop:          prop,
+	//		Formation:     form.NewFormation(c.conf.Formation(prop.Formations()[0]), prop.Size()),
+	//		EntityCommand: make(chan int),
+	//		Guide:         0,
+	//		Members:       make([]id.Eid, prop.Size()),
+	//	}
+	//
+	//	// TODO pull info from Formation, currently making block with leader at top left
+	//	k := 0
+	//	entRet := make([]ent.Entity, prop.Size())
+	//	for name, count := range u.Prop().Members() {
+	//		for i := 0; i < count; i++ {
+	//			startPos := [2]float64{pos[0] + float64(k)*2.0, pos[1]}
+	//			formOffset := [2]float64{float64(k % 5), float64(k / 5)}
+	//			entRet[k] = c.entConstr.New(name, u.Id(), u.entityCommand, startPos, formOffset)
+	//			u.members[k] = entRet[k].Id()
+	//			if k == 0 {
+	//				u.guide = u.members[k]
+	//			}
+	//			k++
+	//		}
+	//	}
+	//
+	//	return &u, entRet
+	return un.Unit{}, nil
 }

@@ -1,7 +1,6 @@
 package formation
 
 import (
-	pr "github.com/StStep/go-test-simulation/internal/formationprop"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )
@@ -23,7 +22,7 @@ func TestNewFormation(t *testing.T) {
 	}
 
 	for i, v := range tables {
-		f := NewFormation(pr.NewFormationProp(v.style, v.width, v.fileSpacing, v.rankSpacing), v.size)
+		f := NewFormation(&Prop{v.style, v.width, v.fileSpacing, v.rankSpacing}, v.size)
 		assert.Equal(v.size, f.size, "Test %v", i)
 		assert.Equal(v.expCapSlot, f.capSlot, "Test %v", i)
 		assert.Equal("Captain", f.tags[f.capSlot], "Test %v", i)
@@ -55,7 +54,7 @@ func TestGiveTakeSlot(t *testing.T) {
 	}
 
 	for i, v := range tables {
-		f := NewFormation(pr.NewFormationProp(v.style, v.width, v.fileSpacing, v.rankSpacing), v.size)
+		f := NewFormation(&Prop{v.style, v.width, v.fileSpacing, v.rankSpacing}, v.size)
 		for _, closedSlot := range v.notEmpty {
 			assert.Truef(f.TakeSlot(closedSlot), "Test %v", i)
 		}
@@ -86,7 +85,7 @@ func TestTakeClosestOpenSlot(t *testing.T) {
 	}
 
 	for i, v := range tables {
-		f := NewFormation(pr.NewFormationProp(v.style, v.width, v.fileSpacing, v.rankSpacing), v.size)
+		f := NewFormation(&Prop{v.style, v.width, v.fileSpacing, v.rankSpacing}, v.size)
 		for _, closedSlot := range v.notEmpty {
 			assert.Truef(f.TakeSlot(closedSlot), "Test %v", i)
 		}
