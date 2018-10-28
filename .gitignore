@@ -1,3 +1,6 @@
+#Runtime artifacts
+*.logfmt
+
 # Not bothering commiting vender stuff
 vendor*
 
@@ -9,7 +12,7 @@ vendor*
 *.dll
 *.so
 *.dylib
-runSim
+./runSim
 
 # Test binary, build with `go test -c`
 *.test

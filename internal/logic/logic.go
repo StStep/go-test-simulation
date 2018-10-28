@@ -6,7 +6,7 @@ import (
 	fl "gonum.org/v1/gonum/floats"
 )
 
-func Error(e *unit.Entity, state *state.State) (dir [2]float64, dist float64) {
+func error(e *unit.Entity, state *state.State) (dir [2]float64, dist float64) {
 	g := state.Physics.Position(state.Ledger.UnitData[e.UnitId].GuideId)
 	pos := state.Physics.Position(e.Id)
 	fl.Sub(g[:], pos[:])
@@ -21,7 +21,7 @@ func LogicStep(u *unit.Unit, state *state.State, del float64) {
 		e := state.Ledger.EntityData[v]
 
 		// TODO Currently only setting CmdVel depending upon offset and pos
-		dir, dist := Error(e, state)
+		dir, dist := error(e, state)
 
 		// TODO Shouldn't use dist as speed, just rough placeholder
 		state.Physics.SetCommand(e.Id, dir, dist)

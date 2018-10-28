@@ -14,22 +14,9 @@ type State struct {
 	eidGen        *idGen
 }
 
-type Ledger struct {
-	UnitData   map[uint64]*unit.Unit
-	EntityData map[uint64]*unit.Entity
-}
-
-type idGen struct {
-	lastid uint64
-}
-
-func (gen *idGen) Reset() {
-	gen.lastid = 0
-}
-
-func (gen *idGen) Id() uint64 {
-	gen.lastid = gen.lastid + 1
-	return gen.lastid
+func New(confFile string) *State {
+	state := State{conf.FromFile(confFile), newLedger(), physics.New(), newIdGen(), newIdGen()}
+	return &state
 }
 
 func (state *State) newEntity(name string, uid uint64, cmd chan int, pos [2]float64, offset [2]float64) *unit.Entity {
@@ -74,4 +61,32 @@ func (state *State) NewUnit(name string, pos [2]float64) {
 	//	}
 	//
 	//	return &u, entRet
+}
+
+type Ledger struct {
+	UnitData   map[uint64]*unit.Unit
+	EntityData map[uint64]*unit.Entity
+}
+
+func newLedger() *Ledger {
+	return &Ledger{make(map[uint64]*unit.Unit), make(map[uint64]*unit.Entity)}
+}
+
+type idGen struct {
+	lastid uint64
+}
+
+func newIdGen() *idGen {
+	gen := idGen{}
+	gen.Reset()
+	return &gen
+}
+
+func (gen *idGen) Reset() {
+	gen.lastid = 0
+}
+
+func (gen *idGen) Id() uint64 {
+	gen.lastid = gen.lastid + 1
+	return gen.lastid
 }

@@ -35,7 +35,7 @@ func TestFile(t *testing.T) {
 		rpath  string
 		rpanic bool
 	}{
-		{"config.json", false, "config.json", false},
+		{"test.json", false, "test.json", false},
 	}
 
 	for i, v := range tables {
