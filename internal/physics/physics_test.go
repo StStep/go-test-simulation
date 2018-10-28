@@ -1,7 +1,6 @@
 package physics
 
 import (
-	"github.com/StStep/go-test-simulation/internal/id"
 	pr "github.com/StStep/go-test-simulation/internal/physics/prop"
 	"github.com/stretchr/testify/assert"
 	"testing"
@@ -22,7 +21,7 @@ func TestRegisteration(t *testing.T) {
 		prop := &pr.Prop{[4]float64{}, [4]float64{}, [4]float64{}, [4]float64{}, [4]float64{}, 0, 0, 0}
 		s := New()
 		for k := 0; k < v.count; k++ {
-			id := id.Eid(k + 1)
+			id := uint64(k + 1)
 			s.RegisterEntity(id, prop, [2]float64{0, 0})
 			s.SetCommand(id, [2]float64{0, 0}, 0)
 			assert.Truef(s.Contains(id), "Test %v", i)
@@ -30,7 +29,7 @@ func TestRegisteration(t *testing.T) {
 		assert.Equalf(v.expCount, s.EntityCount(), "Test %v", i)
 
 		for k := 0; k < v.count; k++ {
-			id := id.Eid(k + 1)
+			id := uint64(k + 1)
 			s.UnregisterEntity(id)
 			assert.Falsef(s.Contains(id), "Test %v", i)
 		}
@@ -56,7 +55,7 @@ func TestStep(t *testing.T) {
 	for i, v := range tables {
 		prop := &pr.Prop{[4]float64{10, 10, 10, 10}, [4]float64{10, 10, 10, 10}, [4]float64{}, [4]float64{}, [4]float64{}, 0, 0, 0}
 		s := New()
-		id := id.Eid(1)
+		id := uint64(1)
 		s.RegisterEntity(id, prop, v.startPos)
 		s.SetCommand(id, v.dir, v.speed)
 
@@ -76,13 +75,13 @@ func TestCollisions(t *testing.T) {
 	tables := []struct {
 		poss    [][2]float64
 		radii   []float64
-		expColl [][2]id.Eid
+		expColl [][2]uint64
 	}{
 		{[][2]float64{[2]float64{0, 0}, [2]float64{2, 0}}, []float64{1, 1.5},
-			[][2]id.Eid{[2]id.Eid{1, 2}}}, // Simple Collision
+			[][2]uint64{[2]uint64{1, 2}}}, // Simple Collision
 		{[][2]float64{[2]float64{0, 0}, [2]float64{2, 0}, [2]float64{0, 1}}, []float64{1, 1.5, 2},
-			[][2]id.Eid{[2]id.Eid{1, 2}, [2]id.Eid{1, 3}, [2]id.Eid{2, 3}}}, // Double Collision
-		{[][2]float64{[2]float64{0, 0}, [2]float64{2, 0}}, []float64{1, 0.5}, [][2]id.Eid{}}, // No Collision
+			[][2]uint64{[2]uint64{1, 2}, [2]uint64{1, 3}, [2]uint64{2, 3}}}, // Double Collision
+		{[][2]float64{[2]float64{0, 0}, [2]float64{2, 0}}, []float64{1, 0.5}, [][2]uint64{}}, // No Collision
 	}
 
 	for i, v := range tables {
@@ -90,7 +89,7 @@ func TestCollisions(t *testing.T) {
 
 		for k := 0; k < len(v.poss); k++ {
 			prop := &pr.Prop{[4]float64{}, [4]float64{}, [4]float64{}, [4]float64{}, [4]float64{}, 0, 0, v.radii[k]}
-			s.RegisterEntity(id.Eid(k+1), prop, v.poss[k])
+			s.RegisterEntity(uint64(k+1), prop, v.poss[k])
 		}
 		coll := s.Collisions()
 

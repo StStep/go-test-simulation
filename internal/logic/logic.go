@@ -1,14 +1,13 @@
 package logic
 
 import (
-	"github.com/StStep/go-test-simulation/internal/entity"
 	"github.com/StStep/go-test-simulation/internal/state"
 	"github.com/StStep/go-test-simulation/internal/unit"
 	fl "gonum.org/v1/gonum/floats"
 )
 
-func Error(e *entity.Entity, state *state.State) (dir [2]float64, dist float64) {
-	g := state.Physics.Position(state.Ledger.UnitData[e.Unit].Guide)
+func Error(e *unit.Entity, state *state.State) (dir [2]float64, dist float64) {
+	g := state.Physics.Position(state.Ledger.UnitData[e.UnitId].GuideId)
 	pos := state.Physics.Position(e.Id)
 	fl.Sub(g[:], pos[:])
 	dist = fl.Norm(g[:], 2)
@@ -18,7 +17,7 @@ func Error(e *entity.Entity, state *state.State) (dir [2]float64, dist float64) 
 }
 
 func LogicStep(u *unit.Unit, state *state.State, del float64) {
-	for _, v := range u.Members {
+	for _, v := range u.MemberIds {
 		e := state.Ledger.EntityData[v]
 
 		// TODO Currently only setting CmdVel depending upon offset and pos

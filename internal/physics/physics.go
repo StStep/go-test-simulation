@@ -5,7 +5,6 @@ package physics
 
 import (
 	"fmt"
-	"github.com/StStep/go-test-simulation/internal/id"
 	"github.com/StStep/go-test-simulation/internal/physics/inertia"
 	pr "github.com/StStep/go-test-simulation/internal/physics/prop"
 	"github.com/go-logfmt/logfmt"
@@ -14,23 +13,23 @@ import (
 )
 
 type Physics struct {
-	ids       []id.Eid
-	inertia   map[id.Eid]*inertia.Inertia
-	positions map[id.Eid][2]float64
-	radii     map[id.Eid]float64
+	ids       []uint64
+	inertia   map[uint64]*inertia.Inertia
+	positions map[uint64][2]float64
+	radii     map[uint64]float64
 	cvalid    bool
-	ccolls    [][2]id.Eid
+	ccolls    [][2]uint64
 	loge      *logfmt.Encoder
 }
 
 func New() *Physics {
 	var s Physics
-	s.ids = make([]id.Eid, 0)
-	s.inertia = make(map[id.Eid]*inertia.Inertia)
-	s.positions = make(map[id.Eid][2]float64)
-	s.radii = make(map[id.Eid]float64)
+	s.ids = make([]uint64, 0)
+	s.inertia = make(map[uint64]*inertia.Inertia)
+	s.positions = make(map[uint64][2]float64)
+	s.radii = make(map[uint64]float64)
 	s.cvalid = false
-	s.ccolls = make([][2]id.Eid, 0)
+	s.ccolls = make([][2]uint64, 0)
 	s.loge = nil
 
 	return &s
@@ -44,7 +43,7 @@ func (s *Physics) EntityCount() int {
 	return len(s.positions)
 }
 
-func (s *Physics) Contains(id id.Eid) bool {
+func (s *Physics) Contains(id uint64) bool {
 	_, ok1 := s.positions[id]
 	_, ok2 := s.radii[id]
 	_, ok3 := s.inertia[id]
@@ -58,7 +57,7 @@ func (s *Physics) Contains(id id.Eid) bool {
 	return ok1 && ok2 && ok3 && ok4
 }
 
-func (s *Physics) RegisterEntity(id id.Eid, prop *pr.Prop, pos [2]float64) {
+func (s *Physics) RegisterEntity(id uint64, prop *pr.Prop, pos [2]float64) {
 	s.positions[id] = pos
 	s.radii[id] = prop.FootprintRadius
 	s.inertia[id] = inertia.NewInertia(prop)
@@ -73,15 +72,15 @@ func (s *Physics) RegisterEntity(id id.Eid, prop *pr.Prop, pos [2]float64) {
 	}
 }
 
-func (s *Physics) Command(id id.Eid) (dir [2]float64, speed float64) {
+func (s *Physics) Command(id uint64) (dir [2]float64, speed float64) {
 	return s.inertia[id].Command()
 }
 
-func (s *Physics) SetCommand(id id.Eid, dir [2]float64, speed float64) {
+func (s *Physics) SetCommand(id uint64, dir [2]float64, speed float64) {
 	s.inertia[id].SetCommand(dir, speed)
 }
 
-func (s *Physics) UnregisterEntity(id id.Eid) {
+func (s *Physics) UnregisterEntity(id uint64) {
 	// Delete id entries from maps
 	delete(s.positions, id)
 	delete(s.radii, id)
@@ -132,15 +131,15 @@ func (s *Physics) Step(del float64) {
 	s.ccolls = s.ccolls[:0]
 }
 
-func (s *Physics) Position(id id.Eid) [2]float64 {
+func (s *Physics) Position(id uint64) [2]float64 {
 	return s.positions[id]
 }
 
-func (s *Physics) Velocity(id id.Eid) [2]float64 {
+func (s *Physics) Velocity(id uint64) [2]float64 {
 	return s.inertia[id].Velocity()
 }
 
-func (s *Physics) Collisions() [][2]id.Eid {
+func (s *Physics) Collisions() [][2]uint64 {
 	// Send cached if valid
 	if s.cvalid {
 		return s.ccolls
@@ -154,7 +153,7 @@ func (s *Physics) Collisions() [][2]id.Eid {
 			tid := s.ids[k]
 			tpos := s.positions[tid]
 			if fl.Distance(pos[:], tpos[:], 2) < rad+s.radii[tid] {
-				s.ccolls = append(s.ccolls, [2]id.Eid{v, tid})
+				s.ccolls = append(s.ccolls, [2]uint64{v, tid})
 			}
 		}
 	}

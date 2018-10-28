@@ -1,10 +1,9 @@
 package configuration
 
 import (
-	ent "github.com/StStep/go-test-simulation/internal/entity"
-	form "github.com/StStep/go-test-simulation/internal/formation"
 	phy "github.com/StStep/go-test-simulation/internal/physics/prop"
-	un "github.com/StStep/go-test-simulation/internal/unit"
+	"github.com/StStep/go-test-simulation/internal/unit"
+	form "github.com/StStep/go-test-simulation/internal/unit/formation"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )
@@ -22,13 +21,13 @@ func TestFile(t *testing.T) {
 		[4]float64{},
 		0, 0,
 		0.25}
-	config.Entities["swordman"] = &ent.Prop{"swordman", pConf}
+	config.Entities["swordman"] = &unit.EntProp{"swordman", pConf}
 
 	config.Formations[""] = &form.Prop{"", 5, 0.5, 0.5}
 
 	membs := make(map[string]int)
 	membs["swordman"] = 20
-	config.Units["swords"] = &un.Prop{"swords", membs, []string{""}}
+	config.Units["swords"] = &unit.UnitProp{"swords", membs, []string{""}}
 
 	tables := []struct {
 		wpath  string

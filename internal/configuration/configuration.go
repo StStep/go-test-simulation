@@ -2,23 +2,22 @@ package configuration
 
 import (
 	"encoding/json"
-	ent "github.com/StStep/go-test-simulation/internal/entity"
-	form "github.com/StStep/go-test-simulation/internal/formation"
-	un "github.com/StStep/go-test-simulation/internal/unit"
+	"github.com/StStep/go-test-simulation/internal/unit"
+	form "github.com/StStep/go-test-simulation/internal/unit/formation"
 	"io/ioutil"
 	"os"
 )
 
 type Configuration struct {
-	Entities   map[string]*ent.Prop  `json:"entities"`
-	Units      map[string]*un.Prop   `json:"units"`
-	Formations map[string]*form.Prop `json:"formations"`
+	Entities   map[string]*unit.EntProp  `json:"entities"`
+	Units      map[string]*unit.UnitProp `json:"units"`
+	Formations map[string]*form.Prop     `json:"formations"`
 }
 
 func New() *Configuration {
 	c := Configuration{}
-	c.Entities = make(map[string]*ent.Prop)
-	c.Units = make(map[string]*un.Prop)
+	c.Entities = make(map[string]*unit.EntProp)
+	c.Units = make(map[string]*unit.UnitProp)
 	c.Formations = make(map[string]*form.Prop)
 	return &c
 }

@@ -2,14 +2,12 @@ package factory
 
 import (
 	_ "github.com/StStep/go-test-simulation/internal/configuration"
-	ent "github.com/StStep/go-test-simulation/internal/entity"
-	"github.com/StStep/go-test-simulation/internal/id"
 	_ "github.com/StStep/go-test-simulation/internal/physics"
 	"github.com/StStep/go-test-simulation/internal/state"
-	un "github.com/StStep/go-test-simulation/internal/unit"
+	"github.com/StStep/go-test-simulation/internal/unit"
 )
 
-func NewEntity(state *state.State, name string, uid id.Uid, cmd chan int, pos [2]float64, offset [2]float64) *ent.Entity {
+func NewEntity(state *state.State, name string, uid uint64, cmd chan int, pos [2]float64, offset [2]float64) *unit.Entity {
 	//	prop := state.Configuration.Entities[name]
 	//	e := ent.Entity{
 	//		Id:         state.EidGen.Id(),
@@ -23,7 +21,7 @@ func NewEntity(state *state.State, name string, uid id.Uid, cmd chan int, pos [2
 	return nil
 }
 
-func NewUnit(state *state.State, name string, pos [2]float64) (un.Unit, []ent.Entity) {
+func NewUnit(state *state.State, name string, pos [2]float64) (unit.Unit, []unit.Entity) {
 	//	prop := state.Configuration.Units[name]
 	//	u := un.Unit{
 	//		Id:            state.Uidgen.Id(),
@@ -51,5 +49,5 @@ func NewUnit(state *state.State, name string, pos [2]float64) (un.Unit, []ent.En
 	//	}
 	//
 	//	return &u, entRet
-	return un.Unit{}, nil
+	return unit.Unit{}, nil
 }
