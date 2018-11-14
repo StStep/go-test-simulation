@@ -28,6 +28,10 @@ func (m *Inertia) Velocity() [2]float64 {
 func (m *Inertia) Command() ([2]float64, float64) {
 	t := m.cmdVelocity[:]
 	speed := fl.Norm(t, 2)
+	if speed == 0 {
+		return [2]float64{0, 0}, 0
+	}
+
 	fl.Scale(1/speed, t)
 
 	return [2]float64{t[0], t[1]}, speed
