@@ -5,10 +5,11 @@ import (
 )
 
 type Unit struct {
-	Id        uint64
-	Prop      UnitProp
-	GuideId   uint64
-	MemberIds []uint64
+	Id            uint64
+	Prop          *UnitProp
+	GuideId       uint64
+	MemberIds     []uint64
+	EntityCommand chan int
 }
 
 func (u *Unit) Size() int {
